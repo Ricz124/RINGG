@@ -64,7 +64,7 @@ function addSec() {
     newSec.classList.add('sec');
     newSec.id = `sec${secCounter}`;
 
-    // Adiciona conteúdo à nova sec, incluindo os botões de movimento e remoção
+    // Adiciona conteúdo à nova sec, incluindo os botões de movimento, remoção e o novo botão de checkbox
     newSec.innerHTML = `
         <div class="sec-tit" id="sec-tit${secCounter}">
             <h3>Nome ${secCounter}</h3>
@@ -75,10 +75,55 @@ function addSec() {
         <button onclick="mvEsq(this)">esq</button>
         <button onclick="mvDir(this)">dir</button>
         <button onclick="remSec(this)">remover</button>
+        <button onclick="addCheckboxInput(this, 'sec${secCounter}')">Adicionar Checkbox</button>
+        <div class="checkbox-container" id="checkbox-container${secCounter}"></div>
     `;
 
     // Adiciona a nova sec ao container
     container.appendChild(newSec);
+}
+
+// Função para adicionar o input e converter para checkbox
+function addCheckboxInput(button, secId) {
+    const sec = document.getElementById(secId);
+    const checkboxContainer = sec.querySelector('.checkbox-container');
+
+    // Cria o input de texto
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.placeholder = 'Escreva o texto para o checkbox';
+
+    // Cria o botão de confirmar
+    const confirmButton = document.createElement('button');
+    confirmButton.textContent = 'Confirmar';
+
+    // Adiciona os elementos ao container
+    checkboxContainer.appendChild(input);
+    checkboxContainer.appendChild(confirmButton);
+
+    // Quando o botão de confirmar for clicado
+    confirmButton.addEventListener('click', () => {
+        const inputValue = input.value.trim();
+
+        if (inputValue === '') {
+            alert('Por favor, insira um texto válido.');
+            return;
+        }
+
+        // Cria o checkbox e a label
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        const label = document.createElement('label');
+        label.textContent = inputValue;
+
+        // Adiciona o checkbox e a label ao container
+        checkboxContainer.appendChild(checkbox);
+        checkboxContainer.appendChild(label);
+
+        // Remove o input e o botão de confirmar após adicionar o checkbox
+        input.remove();
+        confirmButton.remove();
+    });
 }
 
 document.addEventListener('DOMContentLoaded', () => {
