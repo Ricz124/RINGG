@@ -131,4 +131,40 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Adiciona o evento de clique ao botão de adicionar
     addButton.addEventListener('click', addSec);
+
+    // Função para remover as seções iniciais 'Nome Inicial 1, 2 e 3'
+    const initialSections = ['sec1', 'sec2', 'sec3'];
+    initialSections.forEach(secId => {
+        const secToRemove = document.getElementById(secId);
+        if (secToRemove) {
+            secToRemove.remove();
+        }
+    });
 });
+
+function saveSection(sectionTitle) {
+    const data = { sectionTitle: sectionTitle };
+
+    fetch('save_section.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+    }).then(response => response.json())
+      .then(result => {
+          console.log('Seção salva:', result);
+      });
+}
+
+function saveCheckbox(sectionId, label, checked) {
+    const data = { sectionId: sectionId, label: label, checked: checked };
+
+    fetch('save_checkbox.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+    }).then(response => response.json())
+      .then(result => {
+          console.log('Checkbox salvo:', result);
+      });
+}
+
