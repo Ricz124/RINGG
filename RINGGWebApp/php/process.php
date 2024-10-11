@@ -1,6 +1,10 @@
 <?php
 session_start();
-require 'db_connections.php';
+require 'db_connections.php'; // Certifique-se de que o caminho está correto
+
+if (!isset($conn)) {
+    die("Falha na conexão com o banco de dados.");
+}
 
 if (isset($_POST['register'])) {
     $username = mysqli_real_escape_string($conn, $_POST['username']);
