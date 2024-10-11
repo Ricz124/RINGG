@@ -1,0 +1,115 @@
+@import url('https://fonts.googleapis.com/css2?family=Itim&display=swap');
+
+button{
+	 margin-top: 35px;
+	 margin-left: 140px;
+	 border-radius: 6px;
+	 background-color: #91e9d8;
+	 border: 1px solid #55c7b1;
+	 height: 38px;
+	 width: 100px;
+	 font-family: Itim;
+
+} 
+#intro{
+	 font-family: Itim;
+}
+#l1{
+	margin-top: 35px;
+	 margin-left: 320px;
+	 border-radius: 6px;
+	 background-color: #91e9d8;
+	 border: 1px solid #55c7b1;
+	 height: 38px;
+	 width: 100px; 
+	 font-family: Itim;
+
+}
+#caixa{
+	margin-top: 220px;
+	width:100%; 
+	height: 100px;
+	display:flex;
+	justify-content: center;
+	align-items: center;
+	}
+#entrar{
+	background-color: #55c7b1;
+	width: 60%;
+	height: 300px;
+	border-style: ridge;
+	border: 3px solid black;
+	border-radius: 3px;
+}
+	#t2{
+	color: black;
+	margin: center;
+	font-family: Itim;
+
+}
+#t1{
+	color: white;
+}
+#nave{
+	
+}
+#img3{
+	width: 100px;
+	height: 100px;
+	
+}
+#form{
+	margin-left: 450px;
+    margin-right: 500px;
+    height: 260px;
+    width: 370px;
+     border-style: ridge;
+     border: 3px solid black;
+  border-radius: 3px;
+  padding-top: 30px;
+  background-color: #91e9d8;
+}
+
+input{
+	margin-left: 30px;
+	background-color: #55c7b1;
+	border-style: ridge;
+	border-radius: 3px;
+	border: 1px solid #55c7b1;
+	height: 25px;
+	width: 300px;
+}
+
+label{
+	margin-left: 50px;
+}
+
+#cadastrar{
+	margin-left: 140px;
+	border-radius: 6px;
+	background-color: #55c7b1;
+	border: 1px solid #55c7b1;
+	height: 38px;
+	width: 100px;
+
+
+}
+
+#cad{
+	font-family: Itim;
+	margin-left: 570px;
+
+}
+
+#log{
+	margin-left: 490px;
+	text-decoration: none;
+	font-family: Itim;
+}
+#ct{
+	font-family: Itim;
+}
+a{
+	text-decoration: none;
+}
+
