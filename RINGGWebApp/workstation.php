@@ -1,3 +1,4 @@
+<?php include 'session_start.php'; ?> <!-- Inclui o arquivo de sessão -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -58,6 +59,11 @@
                     <button onclick="mvDir(this)">dir</button>
                     <button onclick="remSec(this)">remover</button>
                 </div>
+            </div>
+
+            <!-- Link para voltar ao dashboard -->
+            <div class="back-link">
+                <a href="php/dashboard.php">Voltar ao Dashboard</a>
             </div>
         </div>
     </div>

@@ -1,18 +1,19 @@
 <?php
-// Credenciais de conexão com o banco de dados
-$host = 'localhost';   // Nome do servidor ou endereço IP
-$dbname = 'workspace_db'; // Nome do banco de dados
-$username = 'root';    // Nome de usuário do banco de dados
-$password = '';        // Senha do banco de dados
+// Parâmetros de conexão
+$host = 'localhost'; 
+$dbname = 'workspace_db'; 
+$username = 'root'; 
+$password = ''; 
 
-// Criar conexão
-$conn = new mysqli($servername, $username, $password, $dbname);
-
-// Verificar conexão
-if ($conn->connect_error) {
-    die("Conexão falhou: " . $conn->connect_error);
+try {
+    // Cria a conexão
+    $pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
+    // Define o modo de erro do PDO para exceções
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
+    error_log("Falha na conexão com o banco de dados: " . $e->getMessage());
+    die("Falha na conexão com o banco de dados.");
 }
 
-// Mensagem de sucesso
-echo "Conexão com o banco de dados estabelecida com sucesso!";
+// O objeto de conexão ($pdo) agora está pronto para ser usado
 ?>
