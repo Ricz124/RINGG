@@ -3,4 +3,61 @@
 *{
   padding: 0;
   margin: auto;
+  font-family: system-ui;
+}
+
+nav{
+  background-color: #368D7B;
+  width: auto;
+  height: 70px;
+  display: flex;
+  margin: 10px;
+  border-radius: 20px;
+  justify-content: center;
+  align-items: center;
+}
+
+.icone-ringg img{
+  width: 50px;
+  background-color: white;
+  padding: 5px;
+  border-radius: 100%;
+}
+
+.navbar{
+  display: flex;
+}
+
+.navbar ul{
+  display: flex;
+  list-style: none;
+  gap: 15px;
+
+}
+
+.navbar ul a{
+  min-width: 127px;
+  max-height: 18px;
+  text-align: center;
+  text-decoration: none;
+  color: rgb(29, 29, 29);
+  background-color: #5adac0;
+  padding: 13px;
+  border-radius: 8px;
+  transition: all 0.5s;
+
+}
+
+.navbar ul a:hover{
+  padding: 16px;
+  background-color: white;
+  color: black;
+}
+
+@media screen and (max-width: 890px) {
+
+  .navbar{
+    display: none;
+  }
+  
 }
