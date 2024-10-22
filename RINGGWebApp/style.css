@@ -7,6 +7,10 @@
     font-family: 'Red Hat Display', sans-serif;
 }
 
+#btRemov{
+    color: red;
+}
+
 body {
     background-color: lightgrey;
     display: flex;
@@ -135,3 +139,16 @@ nav h3 {
 .sec button:nth-child(1):hover {
     background-color: crimson;
 }
+
+ul li{
+    list-style: none;
+}
+
+input[type="checkbox"] {
+    margin: 0; /* Remove margens padrão */
+    vertical-align: middle; /* Alinha verticalmente ao meio */
+    /* Você pode adicionar um tamanho fixo, se necessário */
+    width: 20px; /* Ajuste o tamanho conforme necessário */
+    height: 20px; /* Ajuste o tamanho conforme necessário */
+}
+
