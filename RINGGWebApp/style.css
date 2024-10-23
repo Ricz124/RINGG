@@ -1,19 +1,10 @@
 @import url('https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@300..900&display=swap');
 
 * {
-    margin: auto;
+    margin: 0;
     padding: 0;
     box-sizing: border-box;
     font-family: 'Red Hat Display', sans-serif;
-}
-
-.back-link a{
-    text-decoration: none;
-    color: #269077;
-}
-
-#btRemov{
-    color: red;
 }
 
 body {
@@ -25,16 +16,13 @@ body {
     min-height: 100vh;
 }
 
-#bagui{
-    width: 50px;
-}
-
 nav {
     background-color: teal;
     display: flex;
-    justify-content: space-around;
+    justify-content: space-between;
     padding: 10px 20px;
     width: 100%;
+    max-width: 1200px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     margin-bottom: 20px;
 }
@@ -44,14 +32,13 @@ nav h3 {
     color: white;
 }
 
-
 .wrkspc {
     background-color: white;
     width: 90%;
     max-width: 1200px;
     padding: 20px;
     border-radius: 10px;
-    box-shadow: 0px 10px 10px 10px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .wrkspc-tit {
@@ -145,16 +132,3 @@ nav h3 {
 .sec button:nth-child(1):hover {
     background-color: crimson;
 }
-
-ul li{
-    list-style: none;
-}
-
-input[type="checkbox"] {
-    margin: 0; /* Remove margens padrão */
-    vertical-align: middle; /* Alinha verticalmente ao meio */
-    /* Você pode adicionar um tamanho fixo, se necessário */
-    width: 20px; /* Ajuste o tamanho conforme necessário */
-    height: 20px; /* Ajuste o tamanho conforme necessário */
-}
-
