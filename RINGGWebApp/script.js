@@ -10,29 +10,46 @@ function remSec(button) {
         });
 }
 
-// Função para remover a seção do servidor
-function removeSection(sectionId) {
+// Função para remover a seção do servidor e do DOM
+function removeSection(sectionId, sectionElement) {
     const data = { sectionId: sectionId };
 
-    return fetch('php/remove_section.php', {
+    fetch('php/remove_section.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
     })
     .then(response => {
-        if (!response.ok) {
-            throw new Error(`Erro de rede: ${response.status}`);
-        }
-        return response.json();
+        // Adicionar esse console.log para ver a resposta crua do servidor
+        return response.text().then(text => {
+            console.log('Resposta bruta do servidor:', text);
+
+            // Tente parsear o JSON depois de visualizar a resposta
+            try {
+                return JSON.parse(text);
+            } catch (e) {
+                throw new Error('Erro ao parsear o JSON: ' + e.message);
+            }
+        });
     })
     .then(result => {
-        console.log('Seção removida:', result);
-        if (result.status !== 'success') {
+        if (result.status === 'success') {
+            console.log('Seção removida com sucesso:', result);
+
+            // Remove a seção do DOM após sucesso
+            sectionElement.remove();
+        } else {
             throw new Error(result.message);
         }
     })
-    .catch(error => console.error('Erro ao remover a seção:', error));
+    .catch(error => {
+        console.error('Erro ao remover a seção:', error);
+
+        // Exibir feedback ao usuário, como um alerta ou modal de erro
+        alert('Erro ao remover a seção: ' + error.message);
+    });
 }
+
 
 
 // Função para mover a seção para a esquerda
