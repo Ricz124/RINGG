@@ -66,7 +66,7 @@
                     </div>
                     <button onclick="mvEsq(this)">esq</button>
                     <button onclick="mvDir(this)">dir</button>
-                    <button onclick="remSec(sectionId)">Remover Seção</button>
+                    <button onclick="remSec(this)">Remover Seção</button>
 
                 </div>
                 <div class="sec" id="sec3">

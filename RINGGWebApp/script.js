@@ -133,7 +133,7 @@ function addSec() {
         </div>
         <button onclick="mvEsq(this)">esq</button>
         <button onclick="mvDir(this)">dir</button>
-        <button onclick="remSec(sectionId)">Remover Seção</button>
+        <button onclick="remSec(this)">Remover Seção</button>
         <button onclick="addCheckboxInput(this, 'sec${secCounter}')">Adicionar Checkbox</button>
         <div class="checkbox-container" id="checkbox-container${secCounter}"></div>
     `;
@@ -283,7 +283,7 @@ function loadSections() {
                         </div>
                         <button onclick="mvEsq(this)">esq</button>
                         <button onclick="mvDir(this)">dir</button>
-                        <button onclick="remSec(sectionId)">Remover Seção</button>
+                        <button onclick="remSec(this)">Remover Seção</button>
                     `;
 
                     // Adiciona a nova seção ao contêiner
