@@ -1,9 +1,9 @@
 <?php
 // Parâmetros de conexão
-$host = 'localhost'; 
-$dbname = 'workspace_db'; 
-$username = 'root'; 
-$password = ''; 
+$host = 'sql103.byethost7.com'; 
+$dbname = 'b7_37575800_workspace_db'; 
+$username = 'b7_37575800'; 
+$password = 'asdf1234ert'; 
 
 try {
     // Cria a conexão
