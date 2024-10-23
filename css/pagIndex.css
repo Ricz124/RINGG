@@ -1,13 +1,15 @@
 @import url('https://fonts.googleapis.com/css2?family=Itim&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@300..900&display=swap');
 
 *{
   padding: 0;
   margin: auto;
-  font-family: system-ui;
+  font-family: 'Red Hat Display';
+  font-weight: 500;
 }
 
 nav{
-  background-color: #368D7B;
+  background-color: #53B8A6;
   width: auto;
   height: 70px;
   display: flex;
@@ -41,10 +43,11 @@ nav{
   text-align: center;
   text-decoration: none;
   color: rgb(29, 29, 29);
-  background-color: #5adac0;
+  background-color: #8fe0d0;
   padding: 13px;
   border-radius: 8px;
-  transition: all 0.5s;
+  box-shadow: 2px 2px 1px;
+  transition: all 0.3s;
 
 }
 
@@ -52,6 +55,38 @@ nav{
   padding: 16px;
   background-color: white;
   color: black;
+}
+
+.site-corpo{
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.banner-1 img{
+  width: 100%;
+  height: auto;
+  border-radius: 20px;
+}
+
+.sec-1{
+  width: 90%;
+  height: auto;
+  display: flex;
+  gap: 10px;
+}
+
+.art-1{
+  padding: 15px;
+  background-color: rgb(255, 255, 255);
+  box-shadow: 7px 7px 8px 1px rgba(0,0,0,0.52);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  border: 3px solid #53B8A6;
 }
 
 @media screen and (max-width: 890px) {
