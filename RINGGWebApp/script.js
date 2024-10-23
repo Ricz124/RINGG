@@ -20,10 +20,12 @@ function removeSection(sectionId) {
         body: JSON.stringify(data)
     })
     .then(response => {
-        if (!response.ok) {
-            throw new Error(`Erro de rede: ${response.status}`);
-        }
-        return response.json();
+        console.log('Response Status:', response.status);  // Adicione isso para ver o status da resposta
+        return response.text();  // Alterar para 'text()' temporariamente para capturar a resposta bruta
+    })
+    .then(text => {
+        console.log('Raw Response:', text);  // Exibir a resposta bruta
+        return JSON.parse(text);  // Agora tentamos fazer o parse manualmente
     })
     .then(result => {
         console.log('Seção removida:', result);
