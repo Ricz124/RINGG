@@ -5,9 +5,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Workspace</title>
-    <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="../css/pagIndex.css">
+    <link rel="stylesheet" href="style.css">
     <script src="script.js" defer></script>
+    <script src="https://kit.fontawesome.com/602c4605e3.js" crossorigin="anonymous"></script>
 </head>
 <body>
     <nav>
