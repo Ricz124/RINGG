@@ -23,7 +23,7 @@ function remSec(button) {
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: `id=${sectionId}` // Envia o ID da seção no corpo
+        body: new URLSearchParams({ id: sectionId }) // Envia o ID da seção no corpo
     })
     .then(response => {
         if (!response.ok) {
@@ -40,7 +40,7 @@ function remSec(button) {
         }
     })
     .catch(error => {
-        console.error('Erro:', error);
+        console.error('Erro:', error.message); // Captura e exibe qualquer erro
     });
 }
 

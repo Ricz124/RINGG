@@ -2,6 +2,12 @@
 include '../session_start.php'; // Inclua o arquivo de sessão
 include('db_connections.php'); // Conexão com o banco de dados
 
+if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+    header('Content-Type: application/json');
+    echo json_encode(['status' => 'error', 'message' => 'Método HTTP inválido.']);
+    exit;
+}
+
 // Verifica se o usuário está autenticado
 if (!isset($_SESSION['user_id'])) {
     header('Content-Type: application/json');
