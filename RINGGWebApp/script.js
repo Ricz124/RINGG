@@ -1,37 +1,23 @@
 // Função para remover uma seção
 function remSec(button) {
     const secToRemove = button.parentElement;
-    const secId = secToRemove.id; // Captura o ID da seção para remover do banco de dados
-
-    // Chama uma função para remover a seção do servidor
-    removeSection(secId)
-        .then(() => {
-            secToRemove.remove();
-        });
-}
-
-function remSec(button) {
-    const sec = button.parentElement; // Obtém a seção pai
-    const secId = sec.id; // Obtém o ID da seção
+    const secId = secToRemove.id; // Captura o ID da seção
 
     // Cria o objeto para enviar ao servidor
-    const data = {
-        sectionId: secId // Envia o ID da seção
-    };
+    const data = { sectionId: secId };
 
     // Envia a requisição para remover a seção
     fetch('php/remove_section.php', {
-        method: 'DELETE', // Use DELETE se você está removendo algo
+        method: 'DELETE', // Usar método DELETE
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify(data) // Converte o objeto em JSON
+        body: JSON.stringify(data)
     })
     .then(response => response.json())
     .then(result => {
         if (result.status === 'success') {
-            // Se a remoção foi bem-sucedida, remove a seção do DOM
-            sec.remove();
+            secToRemove.remove(); // Remove a seção do DOM
             console.log('Seção removida com sucesso.');
         } else {
             throw new Error(result.message);
