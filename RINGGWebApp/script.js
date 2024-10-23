@@ -1,37 +1,33 @@
-// Função para remover uma seção
-function remSec(sectionId) {
-    const data = { sectionId: sectionId }; // Passa o ID da seção para o PHP
+function remSec(button) {
+    const secToRemove = button.parentElement;
+    const sectionId = secToRemove.id;
 
     fetch('php/remove_section.php', {
-        method: 'POST',
+        method: 'DELETE',
         headers: {
-            'Content-Type': 'application/json',
+            'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: JSON.stringify(data)
+        body: `id=${sectionId}` // Send the section ID in the body
     })
     .then(response => {
         if (!response.ok) {
-            throw new Error('Erro na rede: ' + response.status);
+            throw new Error('Network response was not ok');
         }
         return response.json();
     })
     .then(data => {
-        if (data.status === 'success') {
-            console.log('Seção removida com sucesso:', data);
-            const secToRemove = document.getElementById(sectionId);
-            if (secToRemove) {
-                secToRemove.remove(); // Remove o elemento da interface
-            } else {
-                console.error('Seção não encontrada:', sectionId);
-            }
+        if (data.success) {
+            secToRemove.remove();
+            console.log(data.message);
         } else {
-            console.error('Erro ao remover a seção:', data.message);
+            console.error('Error removing section:', data.message);
         }
     })
     .catch(error => {
-        console.error('Erro ao remover a seção:', error);
+        console.error('Error:', error);
     });
 }
+
 
 // Função para mover a seção para a esquerda
 function mvEsq(button) {
