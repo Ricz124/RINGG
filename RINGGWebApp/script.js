@@ -1,13 +1,19 @@
 function remSec(button) {
-    const secToRemove = button.parentElement;
-    const sectionId = secToRemove.id;
+    const secToRemove = button.parentElement; // Obtém a seção que contém o botão
+    const sectionId = secToRemove.id; // Obtém o ID da seção
+
+    // Verifique se o ID da seção está definido
+    if (!sectionId) {
+        console.error('ID da seção não encontrado.');
+        return; // Interrompe a execução se o ID não estiver definido
+    }
 
     fetch('php/remove_section.php', {
         method: 'DELETE',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: `id=${sectionId}` // Send the section ID in the body
+        body: `id=${sectionId}` // Envia o ID da seção no corpo
     })
     .then(response => {
         if (!response.ok) {
@@ -17,14 +23,14 @@ function remSec(button) {
     })
     .then(data => {
         if (data.success) {
-            secToRemove.remove();
-            console.log(data.message);
+            secToRemove.remove(); // Remove a seção do DOM
+            console.log(data.message); // Exibe a mensagem de sucesso
         } else {
-            console.error('Error removing section:', data.message);
+            console.error('Erro ao remover seção:', data.message);
         }
     })
     .catch(error => {
-        console.error('Error:', error);
+        console.error('Erro:', error);
     });
 }
 
