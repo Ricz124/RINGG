@@ -1,13 +1,15 @@
 <?php
+ini_set('display_errors', 0);
+error_reporting(0);
+
 // Incluir o arquivo de conexão com o banco de dados
 include '../session_start.php';
 require 'db_connections.php';
 
 // Verificar se o usuário está autenticado
 if (!isset($_SESSION['user_id'])) {
-    header('Content-Type: application/json');
     echo json_encode(['status' => 'error', 'message' => 'Usuário não autenticado.']);
-    exit();
+    exit;
 }
 
 // Definir o cabeçalho para o tipo de conteúdo JSON
@@ -21,10 +23,10 @@ if (isset($input['sectionId'])) {
 
     try {
         // Conectar ao banco de dados
-        $pdo = getDBConnection();
+        $pdo = getDBConnection(); // Supondo que getDBConnection() seja a função que retorna a conexão
 
         // Consulta para remover a seção
-        $stmt = $pdo->prepare("DELETE FROM sections WHERE id = :id");
+        $stmt = $pdo->prepare("DELETE FROM sections WHERE id = :id"); // Substitua 'sections' pelo nome da sua tabela
         $stmt->bindParam(':id', $sectionId, PDO::PARAM_INT);
         $stmt->execute();
 
@@ -53,6 +55,4 @@ if (isset($input['sectionId'])) {
         'message' => 'ID da seção não fornecido.'
     ]);
 }
-
-exit();  // Certifique-se de que não há mais saída
 ?>
