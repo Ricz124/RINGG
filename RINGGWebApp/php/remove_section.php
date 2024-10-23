@@ -1,6 +1,6 @@
 <?php
-include '../session_start.php';
-require 'db_connections.php'; // Conexão com o banco de dados
+include '../session_start.php';  // Iniciar sessão
+require 'db_connections.php';    // Conexão com o banco de dados
 
 // Verificar se o método é POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -9,7 +9,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-// Verificar se o usuário está autenticado a
+// Verificar se o usuário está autenticado
 if (!isset($_SESSION['user_id'])) {
     header('Content-Type: application/json');
     echo json_encode(['status' => 'error', 'message' => 'Usuário não autenticado.']);
@@ -26,15 +26,15 @@ if (json_last_error() !== JSON_ERROR_NONE) {
     exit;
 }
 
-// Obtém e limpa o ID da seção
-$sectionId = trim($data['sectionId']);
+// Verificar se o ID da seção foi enviado e não está vazio
+$sectionId = isset($data['sectionId']) ? trim($data['sectionId']) : null;
 if (empty($sectionId)) {
     header('Content-Type: application/json');
     echo json_encode(['status' => 'error', 'message' => 'ID da seção não pode estar vazio.']);
     exit;
 }
 
-// Prepare a remoção no banco de dados
+// Prepare a remoção da seção no banco de dados
 $userId = $_SESSION['user_id'];
 $stmt = $pdo->prepare("DELETE FROM sections WHERE id = ? AND user_id = ?");
 
@@ -42,7 +42,7 @@ try {
     // Executa a consulta
     $stmt->execute([$sectionId, $userId]);
 
-    // Verifica se alguma linha foi afetada
+    // Verifica se alguma linha foi afetada (remoção bem-sucedida)
     if ($stmt->rowCount() > 0) {
         header('Content-Type: application/json');
         echo json_encode(['status' => 'success', 'message' => 'Seção removida com sucesso.']);
@@ -51,7 +51,9 @@ try {
         echo json_encode(['status' => 'error', 'message' => 'Seção não encontrada ou não pertence ao usuário.']);
     }
 } catch (Exception $e) {
+    // Tratamento de erro ao executar a consulta
     header('Content-Type: application/json');
-    echo json_encode(['status' => 'error', 'message' => 'Houve um erro ao processar: ' . $e->getMessage()]);
+    echo json_encode(['status' => 'error', 'message' => 'Erro ao remover seção: ' . $e->getMessage()]);
+    exit;
 }
 ?>
