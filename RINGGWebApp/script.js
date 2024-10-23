@@ -17,7 +17,16 @@ function remSec(button) {
     .then(response => response.json())
     .then(result => {
         if (result.status === 'success') {
-            secToRemove.remove(); // Remove a
+            secToRemove.remove(); // Remove a seção do DOM
+            console.log('Seção removida com sucesso.');
+        } else {
+            throw new Error(result.message);
+        }
+    })
+    .catch(error => {
+        console.error('Erro ao remover a seção:', error);
+    });
+}
 
 
 // Função para mover a seção para a esquerda
