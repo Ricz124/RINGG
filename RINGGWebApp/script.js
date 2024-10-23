@@ -1,15 +1,15 @@
 function remSec(button) {
-    const secToRemove = button.parentElement;
+    const secToRemove = button.closest('.sec'); // Encontrar o elemento pai com a classe 'sec'
 
-    // Verifique se secToRemove existe
+    // Verifica se secToRemove existe
     if (!secToRemove) {
-        console.error('Elemento pai não encontrado para o botão.');
+        console.error('Elemento pai com a classe .sec não encontrado para o botão.');
         return;
     }
 
     const sectionId = secToRemove.id;
 
-    // Verifique se o secToRemove tem um ID
+    // Verifica se o secToRemove tem um ID
     if (!sectionId) {
         console.error('ID não encontrado para a seção.');
         return;
@@ -17,13 +17,13 @@ function remSec(button) {
 
     console.log('Removendo a seção com ID:', sectionId);
 
-    // Faça a requisição para remover a seção
+    // Faz a requisição para remover a seção
     fetch('php/remove_section.php', {
         method: 'DELETE',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: new URLSearchParams({ id: sectionId }) // Envia o ID da seção no corpo
+        body: `id=${encodeURIComponent(sectionId)}` // Envia o ID da seção no corpo
     })
     .then(response => {
         if (!response.ok) {
@@ -40,7 +40,7 @@ function remSec(button) {
         }
     })
     .catch(error => {
-        console.error('Erro:', error.message); // Captura e exibe qualquer erro
+        console.error('Erro:', error);
     });
 }
 
