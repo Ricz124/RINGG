@@ -12,19 +12,19 @@ function remSec(button) {
 
 // Função para remover uma seção
 function remSec(button) {
-    const secToRemove = button.parentElement; // Captura o elemento da seção
-    const secId = secToRemove.id; // Captura o ID da seção
+    const secToRemove = button.parentElement;
+    const secId = secToRemove.id; // Captura o ID da seção para remover do banco de dados
 
-    // Chama a função para remover a seção do servidor e depois do DOM
-    removeSection(secId, secToRemove) // Passa tanto o ID quanto o elemento da seção
+    // Verifica o valor de secId
+    console.log('ID da seção a ser removida:', secId);
+
+    // Chama uma função para remover a seção do servidor
+    removeSection(secId)
         .then(() => {
-            secToRemove.remove(); // Remove o elemento após o sucesso da remoção no servidor
-        })
-        .catch(error => {
-            console.error('Erro ao tentar remover a seção:', error);
-            alert('Falha ao remover a seção: ' + error.message);
+            secToRemove.remove();
         });
 }
+
 
 // Função para remover a seção do servidor e do DOM
 function removeSection(sectionId, sectionElement) {
