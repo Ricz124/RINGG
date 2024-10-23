@@ -54,7 +54,8 @@
                     </div>
                     <button onclick="mvEsq(this)">esq</button>
                     <button onclick="mvDir(this)">dir</button>
-                    <button onclick="remSec(this)">remover</button>
+                    <button onclick="remSec(sectionId)">Remover Seção</button>
+
                 </div>
                 <div class="sec" id="sec2">
                     <div class="sec-tit" id="sec-tit2">
@@ -65,7 +66,8 @@
                     </div>
                     <button onclick="mvEsq(this)">esq</button>
                     <button onclick="mvDir(this)">dir</button>
-                    <button onclick="remSec(this)">remover</button>
+                    <button onclick="remSec(sectionId)">Remover Seção</button>
+
                 </div>
                 <div class="sec" id="sec3">
                     <div class="sec-tit" id="sec-tit3">
@@ -76,7 +78,8 @@
                     </div>
                     <button onclick="mvEsq(this)">esq</button>
                     <button onclick="mvDir(this)">dir</button>
-                    <button onclick="remSec(this)">remover</button>
+                    <button onclick="remSec(sectionId)">Remover Seção</button>
+
                 </div>
             </div>
 
