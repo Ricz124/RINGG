@@ -10,37 +10,33 @@ function remSec(button) {
         });
 }
 
-// Função para remover a seção do servidor
-function removeSection(sectionId) {
-    const data = { sectionId: sectionId };
+function remSec(button) {
+    const secToRemove = button.parentElement;
+    const sectionId = secToRemove.id; // Supondo que o id é o ID da seção
 
-    return fetch('php/remove_section.php', {
+    fetch('php/endpoint.php', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({ section_id: sectionId }) // Passando o ID da seção a ser removida
     })
-    .then(response => {
-        console.log('Response Status:', response.status);  // Verifica o status da resposta
-        return response.text();  // Captura a resposta como texto
-    })
-    .then(text => {
-        console.log('Raw Response:', text);  // Log da resposta bruta do servidor
-        try {
-            return JSON.parse(text);  // Tenta converter para JSON
-        } catch (error) {
-            console.error('Erro ao analisar JSON:', error, 'Resposta recebida:', text);
-            throw new Error('Erro ao processar resposta JSON.');
-        }
-    })
-    .then(result => {
-        console.log('Seção removida:', result);
-        if (result.status !== 'success') {
-            throw new Error(result.message);
-        }
-    })
-    .catch(error => console.error('Erro ao remover a seção:', error));
-}
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Erro de rede: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.status !== 'success') {
+                throw new Error(`Erro: ${data.message}`);
+            }
 
+            // Se a seção foi removida com sucesso, remova-a do DOM
+            secToRemove.remove();
+        })
+        .catch(error => console.error('Erro ao remover a seção:', error));
+}
 
 // Função para mover a seção para a esquerda
 function mvEsq(button) {
