@@ -2,7 +2,7 @@ function remSec(sectionId) {
     const data = { sectionId: sectionId }; // Passa o ID da seção para o PHP
 
     fetch('php/remove_section.php', {
-        method: 'POST', // ou DELETE dependendo da sua configuração de backend
+        method: 'POST', // ou DELETE, se configurado no backend
         headers: {
             'Content-Type': 'application/json',
         },
