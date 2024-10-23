@@ -2,7 +2,14 @@
 include '../session_start.php';
 require 'db_connections.php'; // Conexão com o banco de dados
 
-// Verificar se o usuário está autenticado
+// Verificar se o método é POST
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    header('Content-Type: application/json');
+    echo json_encode(['status' => 'error', 'message' => 'Método HTTP inválido.']);
+    exit;
+}
+
+// Verificar se o usuário está autenticado a
 if (!isset($_SESSION['user_id'])) {
     header('Content-Type: application/json');
     echo json_encode(['status' => 'error', 'message' => 'Usuário não autenticado.']);
@@ -37,11 +44,14 @@ try {
 
     // Verifica se alguma linha foi afetada
     if ($stmt->rowCount() > 0) {
+        header('Content-Type: application/json');
         echo json_encode(['status' => 'success', 'message' => 'Seção removida com sucesso.']);
     } else {
+        header('Content-Type: application/json');
         echo json_encode(['status' => 'error', 'message' => 'Seção não encontrada ou não pertence ao usuário.']);
     }
 } catch (Exception $e) {
+    header('Content-Type: application/json');
     echo json_encode(['status' => 'error', 'message' => 'Houve um erro ao processar: ' . $e->getMessage()]);
 }
 ?>
