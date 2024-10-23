@@ -255,7 +255,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Função para carregar as seções do servidor
 function loadSections() {
-    fetch('php/load_sections.php')
+    fetch('php/endpoint.php')
         .then(response => response.json())
         .then(data => {
             const container = document.getElementById('espç-sec');
