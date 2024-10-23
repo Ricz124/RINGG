@@ -1,5 +1,5 @@
 <?php
-// Incluir o arquivo de conexão com o banco de dados e iniciar a sessão
+// Incluir o arquivo de conexão com o banco de dados
 include '../session_start.php';
 require 'db_connections.php';
 
@@ -7,36 +7,25 @@ require 'db_connections.php';
 if (!isset($_SESSION['user_id'])) {
     header('Content-Type: application/json');
     echo json_encode(['status' => 'error', 'message' => 'Usuário não autenticado.']);
-    exit;
+    exit();
 }
 
-// Definir o cabeçalho para JSON
+// Definir o cabeçalho para o tipo de conteúdo JSON
 header('Content-Type: application/json');
 
-// Capturar a entrada JSON
+// Captura a entrada JSON
 $input = json_decode(file_get_contents('php://input'), true);
 
-// Verificar se o JSON foi corretamente decodificado
-if (json_last_error() !== JSON_ERROR_NONE) {
-    echo json_encode([
-        'status' => 'error',
-        'message' => 'Erro ao decodificar JSON: ' . json_last_error_msg()
-    ]);
-    exit;
-}
-
-// Verificar se o ID da seção foi enviado
 if (isset($input['sectionId'])) {
     $sectionId = $input['sectionId'];
 
     try {
         // Conectar ao banco de dados
-        $pdo = getDBConnection(); // Função definida em 'db_connections.php'
+        $pdo = getDBConnection();
 
-        // Preparar a consulta para remover a seção
-        $stmt = $pdo->prepare("DELETE FROM sections WHERE id = :id AND user_id = :user_id");
+        // Consulta para remover a seção
+        $stmt = $pdo->prepare("DELETE FROM sections WHERE id = :id");
         $stmt->bindParam(':id', $sectionId, PDO::PARAM_INT);
-        $stmt->bindParam(':user_id', $_SESSION['user_id'], PDO::PARAM_INT);
         $stmt->execute();
 
         // Verificar se a seção foi removida
@@ -48,14 +37,14 @@ if (isset($input['sectionId'])) {
         } else {
             echo json_encode([
                 'status' => 'error',
-                'message' => 'Nenhuma seção encontrada ou a seção não pertence ao usuário.'
+                'message' => 'Nenhuma seção encontrada para remover.'
             ]);
         }
     } catch (PDOException $e) {
-        // Capturar e retornar erros de exceção no banco de dados
+        // Retornar erro se houver uma exceção
         echo json_encode([
             'status' => 'error',
-            'message' => 'Erro ao remover a seção: ' . $e->getMessage()
+            'message' => $e->getMessage()
         ]);
     }
 } else {
@@ -64,4 +53,6 @@ if (isset($input['sectionId'])) {
         'message' => 'ID da seção não fornecido.'
     ]);
 }
+
+exit();  // Certifique-se de que não há mais saída
 ?>

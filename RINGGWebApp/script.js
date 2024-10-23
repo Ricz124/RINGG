@@ -20,12 +20,17 @@ function removeSection(sectionId) {
         body: JSON.stringify(data)
     })
     .then(response => {
-        console.log('Response Status:', response.status);  // Adicione isso para ver o status da resposta
-        return response.text();  // Alterar para 'text()' temporariamente para capturar a resposta bruta
+        console.log('Response Status:', response.status);  // Verifica o status da resposta
+        return response.text();  // Captura a resposta como texto
     })
     .then(text => {
-        console.log('Raw Response:', text);  // Exibir a resposta bruta
-        return JSON.parse(text);  // Agora tentamos fazer o parse manualmente
+        console.log('Raw Response:', text);  // Log da resposta bruta do servidor
+        try {
+            return JSON.parse(text);  // Tenta converter para JSON
+        } catch (error) {
+            console.error('Erro ao analisar JSON:', error, 'Resposta recebida:', text);
+            throw new Error('Erro ao processar resposta JSON.');
+        }
     })
     .then(result => {
         console.log('Seção removida:', result);
@@ -35,6 +40,7 @@ function removeSection(sectionId) {
     })
     .catch(error => console.error('Erro ao remover a seção:', error));
 }
+
 
 // Função para mover a seção para a esquerda
 function mvEsq(button) {
