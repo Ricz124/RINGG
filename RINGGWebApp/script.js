@@ -10,21 +10,37 @@ function remSec(button) {
         });
 }
 
+// Função para remover uma seção
+function remSec(button) {
+    const secToRemove = button.parentElement; // Captura o elemento da seção
+    const secId = secToRemove.id; // Captura o ID da seção
+
+    // Chama a função para remover a seção do servidor e depois do DOM
+    removeSection(secId, secToRemove) // Passa tanto o ID quanto o elemento da seção
+        .then(() => {
+            secToRemove.remove(); // Remove o elemento após o sucesso da remoção no servidor
+        })
+        .catch(error => {
+            console.error('Erro ao tentar remover a seção:', error);
+            alert('Falha ao remover a seção: ' + error.message);
+        });
+}
+
 // Função para remover a seção do servidor e do DOM
 function removeSection(sectionId, sectionElement) {
     const data = { sectionId: sectionId };
 
-    fetch('php/remove_section.php', {
+    return fetch('php/remove_section.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
     })
     .then(response => {
-        // Adicionar esse console.log para ver a resposta crua do servidor
+        // Verificar a resposta crua do servidor
         return response.text().then(text => {
             console.log('Resposta bruta do servidor:', text);
 
-            // Tente parsear o JSON depois de visualizar a resposta
+            // Tentar converter o texto para JSON
             try {
                 return JSON.parse(text);
             } catch (e) {
@@ -35,20 +51,18 @@ function removeSection(sectionId, sectionElement) {
     .then(result => {
         if (result.status === 'success') {
             console.log('Seção removida com sucesso:', result);
-
-            // Remove a seção do DOM após sucesso
-            sectionElement.remove();
+            // Aqui podemos manipular a interface, como remover a seção do DOM
         } else {
             throw new Error(result.message);
         }
     })
     .catch(error => {
         console.error('Erro ao remover a seção:', error);
-
-        // Exibir feedback ao usuário, como um alerta ou modal de erro
-        alert('Erro ao remover a seção: ' + error.message);
+        // Lança o erro para ser tratado na função chamadora
+        throw error;
     });
 }
+
 
 
 
