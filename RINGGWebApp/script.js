@@ -264,13 +264,28 @@ document.addEventListener('DOMContentLoaded', () => {
 // Função para carregar as seções do servidor
 function loadSections() {
     fetch('php/endpoint.php')
-        .then(response => response.json())
+        .then(response => {
+            // Verifica se a resposta é bem-sucedida
+            if (!response.ok) {
+                throw new Error(`Erro de rede: ${response.status}`);
+            }
+            return response.json();
+        })
         .then(data => {
+            // Verifica se o status é 'success'
+            if (data.status !== 'success') {
+                console.error('Erro:', data.message);
+                return; // Interrompe a execução se houver erro
+            }
+
             const container = document.getElementById('espç-sec');
+            // Limpa o container antes de adicionar novas seções
+            container.innerHTML = '';
+
             data.sections.forEach(section => {
                 const newSec = document.createElement('div');
                 newSec.classList.add('sec');
-                newSec.id = section.id;
+                newSec.id = `section-${section.id}`; // Usando um prefixo para evitar conflitos
 
                 newSec.innerHTML = `
                     <div class="sec-tit" id="sec-tit${section.id}">
