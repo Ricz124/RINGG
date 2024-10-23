@@ -1,5 +1,5 @@
 <?php
-// Incluir o arquivo de conexão com o banco de dados
+// Incluir o arquivo de conexão com o banco de dados e iniciar a sessão
 include '../session_start.php';
 require 'db_connections.php';
 
@@ -10,22 +10,33 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 
-// Definir o cabeçalho para o tipo de conteúdo JSON
+// Definir o cabeçalho para JSON
 header('Content-Type: application/json');
 
-// Captura a entrada JSON
+// Capturar a entrada JSON
 $input = json_decode(file_get_contents('php://input'), true);
 
+// Verificar se o JSON foi corretamente decodificado
+if (json_last_error() !== JSON_ERROR_NONE) {
+    echo json_encode([
+        'status' => 'error',
+        'message' => 'Erro ao decodificar JSON: ' . json_last_error_msg()
+    ]);
+    exit;
+}
+
+// Verificar se o ID da seção foi enviado
 if (isset($input['sectionId'])) {
     $sectionId = $input['sectionId'];
 
     try {
         // Conectar ao banco de dados
-        $pdo = getDBConnection(); // Supondo que getDBConnection() seja a função que retorna a conexão
+        $pdo = getDBConnection(); // Função definida em 'db_connections.php'
 
-        // Consulta para remover a seção
-        $stmt = $pdo->prepare("DELETE FROM sections WHERE id = :id"); // Substitua 'sections' pelo nome da sua tabela
+        // Preparar a consulta para remover a seção
+        $stmt = $pdo->prepare("DELETE FROM sections WHERE id = :id AND user_id = :user_id");
         $stmt->bindParam(':id', $sectionId, PDO::PARAM_INT);
+        $stmt->bindParam(':user_id', $_SESSION['user_id'], PDO::PARAM_INT);
         $stmt->execute();
 
         // Verificar se a seção foi removida
@@ -37,14 +48,14 @@ if (isset($input['sectionId'])) {
         } else {
             echo json_encode([
                 'status' => 'error',
-                'message' => 'Nenhuma seção encontrada para remover.'
+                'message' => 'Nenhuma seção encontrada ou a seção não pertence ao usuário.'
             ]);
         }
     } catch (PDOException $e) {
-        // Retornar erro se houver uma exceção
+        // Capturar e retornar erros de exceção no banco de dados
         echo json_encode([
             'status' => 'error',
-            'message' => $e->getMessage()
+            'message' => 'Erro ao remover a seção: ' . $e->getMessage()
         ]);
     }
 } else {
