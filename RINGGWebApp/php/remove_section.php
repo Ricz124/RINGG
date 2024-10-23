@@ -10,13 +10,6 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 // Verificar se o usuário está autenticado a
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header('Content-Type: application/json');
-    echo json_encode(['status' => 'error', 'message' => 'Método HTTP inválido.']);
-    exit;
-}
-
-// Verificar se o usuário está autenticado a
 if (!isset($_SESSION['user_id'])) {
     header('Content-Type: application/json');
     echo json_encode(['status' => 'error', 'message' => 'Usuário não autenticado.']);
