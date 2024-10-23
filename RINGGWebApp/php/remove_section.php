@@ -1,5 +1,6 @@
 <?php
-include 'db_connection.php'; // Inclua sua conexão com o banco de dados aqui
+include '../session_start.php';
+require 'db_connections.php';
 
 // Verifique se o método da requisição é DELETE
 if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
