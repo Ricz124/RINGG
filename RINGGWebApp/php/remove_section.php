@@ -1,6 +1,7 @@
 <?php
 // Incluir o arquivo de conexão com o banco de dados
 require 'db_connections.php';
+include '../session_start.php';
 
 // Definir o cabeçalho para o tipo de conteúdo JSON
 header('Content-Type: application/json');
