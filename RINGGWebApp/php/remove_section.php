@@ -36,7 +36,7 @@ if (empty($sectionId)) {
 
 // Prepare a remoção da seção no banco de dados
 $userId = $_SESSION['user_id'];
-$stmt = $pdo->prepare("DELETE FROM sections WHERE id = ? AND user_id = $sectionId");
+$stmt = $pdo->prepare("DELETE FROM sections WHERE id = ? AND user_id = ?");
 
 try {
     // Executa a consulta
