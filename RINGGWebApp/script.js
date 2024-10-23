@@ -10,28 +10,36 @@ function remSec(button) {
         });
 }
 
-// Função para remover a seção do servidor
-function removeSection(sectionId) {
-    const data = { sectionId: sectionId };
+function remSec(button) {
+    const sec = button.parentElement; // Obtém a seção pai
+    const secId = sec.id; // Obtém o ID da seção
 
-    return fetch('php/remove_section.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
+    // Cria o objeto para enviar ao servidor
+    const data = {
+        sectionId: secId // Envia o ID da seção
+    };
+
+    // Envia a requisição para remover a seção
+    fetch('php/remove_section.php', {
+        method: 'DELETE', // Use DELETE se você está removendo algo
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data) // Converte o objeto em JSON
     })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error(`Erro de rede: ${response.status}`);
-        }
-        return response.json();
-    })
+    .then(response => response.json())
     .then(result => {
-        console.log('Seção removida:', result);
-        if (result.status !== 'success') {
+        if (result.status === 'success') {
+            // Se a remoção foi bem-sucedida, remove a seção do DOM
+            sec.remove();
+            console.log('Seção removida com sucesso.');
+        } else {
             throw new Error(result.message);
         }
     })
-    .catch(error => console.error('Erro ao remover a seção:', error));
+    .catch(error => {
+        console.error('Erro ao remover a seção:', error);
+    });
 }
 
 // Função para mover a seção para a esquerda
@@ -69,7 +77,6 @@ function editTit(button, secTitId) {
     saveBtn.style.display = 'inline';
 }
 
-// Função para salvar o novo título
 function saveTit(button, secTitId) {
     const secTit = document.getElementById(secTitId);
     const h3 = secTit.querySelector('h3');
@@ -88,7 +95,7 @@ function saveTit(button, secTitId) {
     saveSection(h3.textContent, secTitId); // Aqui passamos o título correto e o ID da seção
 }
 
-// Função para salvar a seção
+
 function saveSection(sectionTitle, sectionId) {
     const data = { sectionTitle: sectionTitle, sectionId: sectionId }; // Passa o ID da seção para o PHP
 
@@ -117,6 +124,9 @@ function saveSection(sectionTitle, sectionId) {
     });
 }
 
+
+
+
 // Função para adicionar uma nova seção
 function addSec() {
     const container = document.getElementById('espç-sec');
@@ -127,7 +137,7 @@ function addSec() {
     newSec.classList.add('sec');
     newSec.id = `sec${secCounter}`;
 
-    // Adiciona conteúdo à nova sec, incluindo os botões de movimento e remoção
+    // Adiciona conteúdo à nova sec
     newSec.innerHTML = `
         <div class="sec-tit" id="sec-tit${secCounter}">
             <h3>Nome ${secCounter}</h3>
@@ -135,21 +145,20 @@ function addSec() {
             <button onclick="editTit(this, 'sec-tit${secCounter}')">Editar</button>
             <button onclick="saveTit(this, 'sec-tit${secCounter}')" style="display: none;">Salvar</button>
         </div>
-        <button onclick="mvEsq(this)">◄</button> <!-- Botão de mover para esquerda -->
-        <button onclick="mvDir(this)">▶</button> <!-- Botão de mover para direita -->
-        <button onclick="remSec(this)" id="btRemov">X</button>
-        <div class="checkbox-container"></div>
+        <button onclick="mvEsq(this)">esq</button>
+        <button onclick="mvDir(this)">dir</button>
+        <button onclick="remSec(this)">remover</button>
         <button onclick="addCheckboxInput(this, 'sec${secCounter}')">Adicionar Checkbox</button>
+        <div class="checkbox-container" id="checkbox-container${secCounter}"></div>
     `;
 
     // Adiciona a nova sec ao container
     container.appendChild(newSec);
-
+    
     // Salva a seção no servidor
     saveSection(`Nome ${secCounter}`, newSec.id); // Aqui você pode salvar o título da seção
 }
 
-// Função para adicionar um novo checkbox
 function addCheckboxInput(button, secId) {
     const sec = document.getElementById(secId);
     const checkboxContainer = sec.querySelector('.checkbox-container');
@@ -162,13 +171,6 @@ function addCheckboxInput(button, secId) {
     // Cria o botão de confirmar
     const confirmButton = document.createElement('button');
     confirmButton.textContent = 'Confirmar';
-
-    // Cria uma lista não ordenada se não existir
-    let checkboxList = checkboxContainer.querySelector('ul');
-    if (!checkboxList) {
-        checkboxList = document.createElement('ul');
-        checkboxContainer.appendChild(checkboxList);
-    }
 
     // Adiciona os elementos ao container
     checkboxContainer.appendChild(input);
@@ -184,24 +186,22 @@ function addCheckboxInput(button, secId) {
         }
 
         // Verifica se o checkbox já existe
-        const existingCheckboxes = Array.from(checkboxList.querySelectorAll('input[type="checkbox"]'));
+        const existingCheckboxes = Array.from(checkboxContainer.querySelectorAll('input[type="checkbox"]'));
         if (existingCheckboxes.some(cb => cb.nextSibling.textContent === inputValue)) {
             alert('Checkbox com esse texto já existe.');
             return;
         }
 
         // Cria o checkbox e a label
-        const checkboxItem = document.createElement('li');
         const checkbox = document.createElement('input');
         checkbox.type = 'checkbox';
         checkbox.checked = false; // Inicialmente não checado
         const label = document.createElement('label');
         label.textContent = inputValue;
 
-        // Adiciona o checkbox e a label ao item da lista
-        checkboxItem.appendChild(checkbox);
-        checkboxItem.appendChild(label);
-        checkboxList.appendChild(checkboxItem);
+        // Adiciona o checkbox e a label ao container
+        checkboxContainer.appendChild(checkbox);
+        checkboxContainer.appendChild(label);
 
         // Salva o checkbox no banco de dados
         saveCheckbox(secId, inputValue, checkbox.checked);
@@ -216,6 +216,7 @@ function addCheckboxInput(button, secId) {
         confirmButton.remove();
     });
 }
+
 
 // Função para salvar checkbox
 function saveCheckbox(sectionId, label, checked) {
@@ -253,33 +254,63 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-// Função para carregar as seções do servidor
+fetch('php/save_section.php', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ sectionTitle: sectionTitle })
+})
+.then(response => response.text()) // Use text() para obter a resposta como texto
+.then(data => {
+    console.log(data); // Verifica a resposta bruta
+    const jsonData = JSON.parse(data); // Tente analisar o JSON aqui
+    console.log(jsonData); // Se não houver erro, continue
+})
+.catch(error => {
+    console.error('Erro ao salvar a seção:', error);
+});
+
 function loadSections() {
-    fetch('php/load_sections.php')
-        .then(response => response.json())
-        .then(data => {
-            const container = document.getElementById('espç-sec');
-            data.sections.forEach(section => {
-                const newSec = document.createElement('div');
-                newSec.classList.add('sec');
-                newSec.id = section.id;
-
-                newSec.innerHTML = `
-                    <div class="sec-tit" id="sec-tit${section.id}">
-                        <h3>${section.title}</h3>
-                        <input type="text" id="edit-tit${section.id}" style="display: none;">
-                        <button onclick="editTit(this, 'sec-tit${section.id}')">Editar</button>
-                        <button onclick="saveTit(this, 'sec-tit${section.id}')" style="display: none;">Salvar</button>
-                    </div>
-                    <button onclick="mvEsq(this)">◄</button>
-                    <button onclick="mvDir(this)">▶</button>
-                    <button onclick="remSec(this)">X</button>
-                    <div class="checkbox-container"></div>
-                    <button onclick="addCheckboxInput(this, '${section.id}')">Adicionar Checkbox</button>
-                `;
-
-                container.appendChild(newSec);
-            });
+    fetch('php/endpoint.php') // Altere para o caminho correto do seu endpoint
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
         })
-        .catch(error => console.error('Erro ao carregar seções:', error));
+        .then(data => {
+            if (data.status === 'success') {
+                const container = document.getElementById('espç-sec'); // Seu contêiner onde as seções são exibidas
+                container.innerHTML = ''; // Limpa o contêiner antes de adicionar novos elementos
+
+                data.sections.forEach(section => {
+                    // Cria um elemento para cada seção
+                    const newSec = document.createElement('div');
+                    newSec.classList.add('sec');
+                    newSec.innerHTML = `
+                        <div class="sec-tit" id="sec-tit${section.id}">
+                            <h3>${section.section_title}</h3>
+                            <input type="text" id="edit-tit${section.id}" style="display: none;">
+                            <button onclick="editTit(this, 'sec-tit${section.id}')">Editar</button>
+                            <button onclick="saveTit(this, 'sec-tit${section.id}')" style="display: none;">Salvar</button>
+                        </div>
+                        <button onclick="mvEsq(this)">esq</button>
+                        <button onclick="mvDir(this)">dir</button>
+                        <button onclick="remSec(this)">remover</button>
+                    `;
+
+                    // Adiciona a nova seção ao contêiner
+                    container.appendChild(newSec);
+                });
+            } else {
+                console.error('Erro ao carregar seções:', data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Erro ao buscar seções:', error);
+        });
 }
+
+// Chame a função quando a página carregar
+document.addEventListener('DOMContentLoaded', loadSections);

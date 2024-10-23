@@ -7,14 +7,12 @@
     <title>Workspace</title>
     <link rel="stylesheet" href="style.css">
     <script src="script.js" defer></script>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
 </head>
 <body>
-    <nav class="navbar fixed-top navbar-light">
-        <a href="../index.html"><img src="../img/img2.jpg" alt="Ringg-icone" id="bagui"></a>
+    <nav>
+        <a href="../pagInicial/pag.html"><img src="#" alt="Ringg-icone" id="bagui"></a>
         <h3>RINGG</h3>
-        <a href=""><img src="../img/img2.png" alt="icone-usu"></a>
+        <a href="#"><img src="#" alt="icone-usu"></a>
     </nav>
 
     <div class="fundo">

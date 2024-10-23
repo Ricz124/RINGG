@@ -1,48 +1,47 @@
 <?php
-// Incluir o arquivo de conexão com o banco de dados
-require 'db_connections.php';
+include '../session_start.php';
+require 'db_connections.php'; // Conexão com o banco de dados
 
-// Definir o cabeçalho para o tipo de conteúdo JSON
-header('Content-Type: application/json');
+// Verificar se o usuário está autenticado
+if (!isset($_SESSION['user_id'])) {
+    header('Content-Type: application/json');
+    echo json_encode(['status' => 'error', 'message' => 'Usuário não autenticado.']);
+    exit;
+}
 
-// Captura a entrada JSON
-$input = json_decode(file_get_contents('php://input'), true);
+// Captura e decodifica a entrada JSON
+$data = json_decode(file_get_contents('php://input'), true);
 
-if (isset($input['sectionId'])) {
-    $sectionId = $input['sectionId'];
+// Verificar se houve erro na decodificação JSON
+if (json_last_error() !== JSON_ERROR_NONE) {
+    header('Content-Type: application/json');
+    echo json_encode(['status' => 'error', 'message' => 'Erro ao decodificar JSON: ' . json_last_error_msg()]);
+    exit;
+}
 
-    try {
-        // Conectar ao banco de dados
-        $pdo = getDBConnection(); // Supondo que getDBConnection() seja a função que retorna a conexão
+// Obtém e limpa o ID da seção
+$sectionId = trim($data['sectionId']);
+if (empty($sectionId)) {
+    header('Content-Type: application/json');
+    echo json_encode(['status' => 'error', 'message' => 'ID da seção não pode estar vazio.']);
+    exit;
+}
 
-        // Consulta para remover a seção
-        $stmt = $pdo->prepare("DELETE FROM sections WHERE id = :id"); // Substitua 'sections' pelo nome da sua tabela
-        $stmt->bindParam(':id', $sectionId, PDO::PARAM_INT);
-        $stmt->execute();
+// Prepare a remoção no banco de dados
+$userId = $_SESSION['user_id'];
+$stmt = $pdo->prepare("DELETE FROM sections WHERE id = ? AND user_id = ?");
 
-        // Verificar se a seção foi removida
-        if ($stmt->rowCount() > 0) {
-            echo json_encode([
-                'status' => 'success',
-                'message' => 'Seção removida com sucesso.'
-            ]);
-        } else {
-            echo json_encode([
-                'status' => 'error',
-                'message' => 'Nenhuma seção encontrada para remover.'
-            ]);
-        }
-    } catch (PDOException $e) {
-        // Retornar erro se houver uma exceção
-        echo json_encode([
-            'status' => 'error',
-            'message' => $e->getMessage()
-        ]);
+try {
+    // Executa a consulta
+    $stmt->execute([$sectionId, $userId]);
+
+    // Verifica se alguma linha foi afetada
+    if ($stmt->rowCount() > 0) {
+        echo json_encode(['status' => 'success', 'message' => 'Seção removida com sucesso.']);
+    } else {
+        echo json_encode(['status' => 'error', 'message' => 'Seção não encontrada ou não pertence ao usuário.']);
     }
-} else {
-    echo json_encode([
-        'status' => 'error',
-        'message' => 'ID da seção não fornecido.'
-    ]);
+} catch (Exception $e) {
+    echo json_encode(['status' => 'error', 'message' => 'Houve um erro ao processar: ' . $e->getMessage()]);
 }
 ?>
