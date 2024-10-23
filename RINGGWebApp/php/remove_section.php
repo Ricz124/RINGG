@@ -1,6 +1,14 @@
 <?php
 // Incluir o arquivo de conexão com o banco de dados
+include '../session_start.php';
 require 'db_connections.php';
+
+// Verificar se o usuário está autenticado
+if (!isset($_SESSION['user_id'])) {
+    header('Content-Type: application/json');
+    echo json_encode(['status' => 'error', 'message' => 'Usuário não autenticado.']);
+    exit;
+}
 
 // Definir o cabeçalho para o tipo de conteúdo JSON
 header('Content-Type: application/json');
