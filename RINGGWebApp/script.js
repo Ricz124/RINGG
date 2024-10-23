@@ -10,60 +10,37 @@ function remSec(button) {
         });
 }
 
-// Função para remover uma seção
 function remSec(button) {
-    const secToRemove = button.parentElement;
-    const secId = secToRemove.id;
+    const sec = button.parentElement; // Obtém a seção pai
+    const secId = sec.id; // Obtém o ID da seção
 
-    // Log do ID da seção antes de enviar para o PHP
-    console.log('Removendo seção com ID:', secId);
+    // Cria o objeto para enviar ao servidor
+    const data = {
+        sectionId: secId // Envia o ID da seção
+    };
 
-    // Chamar a função de remoção da seção no servidor
-    removeSection(secId)
-        .then(() => {
-            secToRemove.remove();
-        });
-}
-
-// Função para remover a seção do servidor e do DOM
-function removeSection(sectionId, sectionElement) {
-    const data = { sectionId: sectionId };
-
-    return fetch('php/remove_section.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
+    // Envia a requisição para remover a seção
+    fetch('php/remove_section.php', {
+        method: 'DELETE', // Use DELETE se você está removendo algo
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data) // Converte o objeto em JSON
     })
-    .then(response => {
-        // Verificar a resposta crua do servidor
-        return response.text().then(text => {
-            console.log('Resposta bruta do servidor:', text);
-
-            // Tentar converter o texto para JSON
-            try {
-                return JSON.parse(text);
-            } catch (e) {
-                throw new Error('Erro ao parsear o JSON: ' + e.message);
-            }
-        });
-    })
+    .then(response => response.json())
     .then(result => {
         if (result.status === 'success') {
-            console.log('Seção removida com sucesso:', result);
-            // Aqui podemos manipular a interface, como remover a seção do DOM
+            // Se a remoção foi bem-sucedida, remove a seção do DOM
+            sec.remove();
+            console.log('Seção removida com sucesso.');
         } else {
             throw new Error(result.message);
         }
     })
     .catch(error => {
         console.error('Erro ao remover a seção:', error);
-        // Lança o erro para ser tratado na função chamadora
-        throw error;
     });
 }
-
-
-
 
 // Função para mover a seção para a esquerda
 function mvEsq(button) {
