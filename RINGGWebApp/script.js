@@ -1,26 +1,25 @@
-// Função para remover uma seção usando POST
-function remSec(button) {
-    const secToRemove = button.parentElement;
-    const secId = secToRemove.id; // Captura o ID da seção
+function remSec(sectionId) {
+    const data = { sectionId: sectionId }; // Passa o ID da seção para o PHP
 
-    // Cria o objeto para enviar ao servidor
-    const data = { sectionId: secId, action: 'delete' };
-
-    // Envia a requisição usando POST
     fetch('php/remove_section.php', {
-        method: 'POST', // Usar POST em vez de DELETE
+        method: 'POST', // ou DELETE dependendo da sua configuração de backend
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
         },
         body: JSON.stringify(data)
     })
-    .then(response => response.json())
-    .then(result => {
-        if (result.status === 'success') {
-            secToRemove.remove(); // Remove a seção do DOM
-            console.log('Seção removida com sucesso.');
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Erro na rede: ' + response.status);
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.status === 'success') {
+            console.log('Seção removida com sucesso:', data);
+            document.getElementById(`sec${sectionId}`).remove(); // Remove o elemento da interface
         } else {
-            throw new Error(result.message);
+            console.error('Erro ao remover a seção:', data.message);
         }
     })
     .catch(error => {
