@@ -126,7 +126,7 @@ function addSec() {
         </div>
         <button onclick="mvEsq(this)">esq</button>
         <button onclick="mvDir(this)">dir</button>
-        <button onclick="remSec(this, '${newSec.id}')">Remover Seção</button>
+        <button onclick="remSec(this)">Remover Seção</button>
     `;
 
     container.appendChild(newSec);
@@ -169,7 +169,7 @@ function loadSections() {
                         </div>
                         <button onclick="mvEsq(this)">esq</button>
                         <button onclick="mvDir(this)">dir</button>
-                        <button onclick="remSec(this, '${newSec.id}')">Remover Seção</button>
+                        <button onclick="remSec(this)">Remover Seção</button>
                     `;
 
                     container.appendChild(newSec);
