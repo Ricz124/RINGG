@@ -1,58 +1,48 @@
 <?php
-include '../session_start.php'; // Certifique-se de que a sessão está sendo iniciada corretamente
-require 'db_connections.php';  // Certifique-se de que a conexão está configurada corretamente
+include '../session_start.php';
+require 'db_connections.php';
 
-// Verifique se o método da requisição é DELETE
-if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
-    parse_str(file_get_contents("php://input"), $post_vars); // Para obter dados do corpo da requisição
-    $id = isset($post_vars['id']) ? intval($post_vars['id']) : null; // Verifique e converta o ID para inteiro
+// Verifica se o método da requisição é POST
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Lê o corpo da requisição JSON
+    $input = file_get_contents('php://input');
+    $data = json_decode($input, true);
 
-    // Verifique se o ID está definido e é um valor válido
-    if ($id) {
-        // Execute a lógica de remoção, como uma consulta SQL para remover a seção
+    // Verifica se o JSON foi decodificado corretamente e se o 'sectionId' foi fornecido
+    if (isset($data['sectionId'])) {
+        $sectionId = $data['sectionId'];
+
+        // Preparar e executar a consulta SQL para remover a seção
         $query = "DELETE FROM sections WHERE id = ?";
         $stmt = $conn->prepare($query);
-        
-        if ($stmt) { // Verifique se a consulta foi preparada corretamente
-            $stmt->bind_param("i", $id); // O ID deve ser um inteiro
-            $success = $stmt->execute();
+        $stmt->bind_param("i", $sectionId); // O ID deve ser um inteiro
+        $success = $stmt->execute();
 
-            if ($success) {
-                // Responda com sucesso
-                echo json_encode([
-                    "status" => "success",
-                    "message" => "Seção removida com sucesso."
-                ]);
-            } else {
-                // Se a execução falhar, responda com erro
-                echo json_encode([
-                    "status" => "error",
-                    "message" => "Erro ao remover a seção: " . $stmt->error // Inclua a mensagem de erro do banco de dados
-                ]);
-            }
-            
-            $stmt->close(); // Feche a declaração
+        if ($success) {
+            // Retorna uma resposta JSON de sucesso
+            echo json_encode([
+                "status" => "success",
+                "message" => "Seção removida com sucesso."
+            ]);
         } else {
-            // Se a preparação da consulta falhar, responda com erro
+            // Retorna uma resposta JSON de erro
             echo json_encode([
                 "status" => "error",
-                "message" => "Erro ao preparar a consulta: " . $conn->error
+                "message" => "Erro ao remover a seção no banco de dados."
             ]);
         }
     } else {
-        // Responda com erro se o ID não estiver definido ou for inválido
+        // Retorna erro se o 'sectionId' não for fornecido
         echo json_encode([
             "status" => "error",
-            "message" => "ID não especificado ou inválido."
+            "message" => "ID da seção não fornecido."
         ]);
     }
 } else {
-    // Responda com erro se o método não for DELETE
+    // Responde com erro se o método não for POST
     echo json_encode([
         "status" => "error",
         "message" => "Método HTTP inválido."
     ]);
 }
-
-$conn->close(); // Feche a conexão com o banco de dados
 ?>
