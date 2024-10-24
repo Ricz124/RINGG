@@ -8,10 +8,11 @@ $pass = ''; // sua senha
 $pdo = new PDO("mysql:host=$host;dbname=$db", $user, $pass);
 
 $data = json_decode(file_get_contents("php://input"));
-$id = $data->id;
+$username = $data->username;
+$password = password_hash($data->password, PASSWORD_DEFAULT);
 
-$stmt = $pdo->prepare("DELETE FROM tasks WHERE id = ?");
-$stmt->execute([$id]);
+$stmt = $pdo->prepare("INSERT INTO users (username, password) VALUES (?, ?)");
+$stmt->execute([$username, $password]);
 
 echo json_encode(['success' => true]);
 ?>

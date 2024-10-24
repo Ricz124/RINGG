@@ -20,6 +20,7 @@
             <input type="date" id="start-date" required>
             <input type="date" id="end-date" required>
             <button id="add-task">Adicionar Tarefa</button>
+            <button id="save-tasks">Salvar Tarefas</button>
         </div>
         <div id="task-list"></div>
     </div>

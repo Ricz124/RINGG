@@ -1,4 +1,5 @@
 <?php
+session_start();
 $host = 'localhost';
 $db = 'gerenciador_tarefas';
 $user = 'root'; // seu usuário
@@ -14,8 +15,10 @@ $priority = $data->priority;
 $startDate = $data->startDate;
 $endDate = $data->endDate;
 
-$stmt = $pdo->prepare("INSERT INTO tasks (title, checkbox_title, priority, start_date, end_date) VALUES (?, ?, ?, ?, ?)");
-$stmt->execute([$title, $checkboxTitle, $priority, $startDate, $endDate]);
+$userId = $_SESSION['user_id']; // Assumindo que o ID do usuário está na sessão
+
+$stmt = $pdo->prepare("INSERT INTO tasks (user_id, title, checkbox_title, priority, start_date, end_date) VALUES (?, ?, ?, ?, ?, ?)");
+$stmt->execute([$userId, $title, $checkboxTitle, $priority, $startDate, $endDate]);
 
 echo json_encode(['success' => true]);
 ?>

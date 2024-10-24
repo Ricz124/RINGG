@@ -1,5 +1,5 @@
 <?php
-include '../session_start.php';
-session_destroy();
-header('Location: index.php');
-exit();
+session_start();
+session_destroy(); // Destroi a sessão do usuário
+header("Location: login.html"); // Redireciona para a página de login
+?>
