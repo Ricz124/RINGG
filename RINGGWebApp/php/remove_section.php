@@ -1,4 +1,5 @@
 <?php
+ob_start(); // Inicia o buffer de saída
 include '../session_start.php'; // Certifique-se de que isso não causa problemas
 require 'db_connections.php';
 
@@ -68,4 +69,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         "message" => "Método HTTP inválido."
     ]);
 }
+ob_end_flush(); // Envia a saída do buffer
 ?>
