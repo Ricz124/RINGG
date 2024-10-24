@@ -3,43 +3,49 @@ document.addEventListener("DOMContentLoaded", function () {
     const saveTasksButton = document.getElementById("save-tasks");
     const taskList = document.getElementById("task-list");
 
+    console.log(taskList); // Verifique se o elemento foi encontrado
+
     if (addTaskButton) {
         addTaskButton.addEventListener("click", function () {
-            const title = document.getElementById("task-title").value;
-            const checkboxTitle = document.getElementById("checkbox-title").value;
+            const title = document.getElementById("task-title").value.trim();
+            const checkboxTitle = document.getElementById("checkbox-title").value.trim();
             const priority = document.getElementById("priority").value;
             const startDate = document.getElementById("start-date").value;
             const endDate = document.getElementById("end-date").value;
 
-            if (title && checkboxTitle && startDate && endDate) {
-                fetch("php/add_task.php", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                        title,
-                        checkboxTitle,
-                        priority,
-                        startDate,
-                        endDate,
-                    }),
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        loadTasks();
-                    } else {
-                        alert("Erro ao adicionar tarefa");
-                    }
-                });
+            if (!title || !checkboxTitle || !startDate || !endDate) {
+                alert("Por favor, preencha todos os campos obrigatórios.");
+                return;
             }
+
+            fetch("RINGGWebApp/php/add_task.php", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    title,
+                    checkboxTitle,
+                    priority,
+                    startDate,
+                    endDate,
+                }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    loadTasks();
+                    clearInputs();
+                } else {
+                    alert("Erro ao adicionar tarefa: " + data.message);
+                }
+            });
         });
     }
 
     if (saveTasksButton) {
         saveTasksButton.addEventListener("click", function () {
-            fetch("php/save_tasks.php", {
+            fetch("RINGGWebApp/php/save_tasks.php", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -51,17 +57,17 @@ document.addEventListener("DOMContentLoaded", function () {
                 if (data.success) {
                     alert("Tarefas salvas com sucesso!");
                 } else {
-                    alert("Erro ao salvar tarefas");
+                    alert("Erro ao salvar tarefas: " + data.message);
                 }
             });
         });
     }
 
     function loadTasks() {
-        fetch("php/fetch_tasks.php")
+        fetch("RINGGWebApp/php/fetch_tasks.php")
             .then(response => response.json())
             .then(tasks => {
-                taskList.innerHTML = "";
+                taskList.innerHTML = ""; // Limpa a lista antes de adicionar
                 tasks.forEach(task => {
                     const taskDiv = document.createElement("div");
                     taskDiv.className = "task";
@@ -78,7 +84,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     window.deleteTask = function (taskId) {
-        fetch("php/delete_task.php", {
+        fetch("RINGGWebApp/php/delete_task.php", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -88,31 +94,20 @@ document.addEventListener("DOMContentLoaded", function () {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                loadTasks();
+                loadTasks(); // Recarrega as tarefas após a exclusão
             } else {
-                alert("Erro ao remover tarefa");
+                alert("Erro ao remover tarefa: " + data.message);
             }
         });
     };
 
-    function deleteTask(taskId) {
-        fetch("php/delete_task.php", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ id: taskId }),
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                location.reload(); // Atualiza a página após excluir a tarefa
-            } else {
-                alert("Erro ao remover tarefa");
-            }
-        });
+    function clearInputs() {
+        document.getElementById("task-title").value = '';
+        document.getElementById("checkbox-title").value = '';
+        document.getElementById("priority").value = '';
+        document.getElementById("start-date").value = '';
+        document.getElementById("end-date").value = '';
     }
-    
 
     loadTasks();
 });
