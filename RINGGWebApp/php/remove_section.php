@@ -9,6 +9,7 @@ require 'db_connections.php';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $input = file_get_contents('php://input');
     $data = json_decode($input, true);
+    print_r($data); // Para ver o que está sendo recebido
 
     if (json_last_error() !== JSON_ERROR_NONE) {
         echo json_encode([
@@ -31,6 +32,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ]);
             exit;
         }
+
+        if ($stmt->execute()) {
+            // Código para sucesso
+        } else {
+            http_response_code(500); // Código de erro interno
+            echo json_encode([
+                "status" => "error",
+                "message" => "Erro ao remover a seção: " . $stmt->error
+            ]);
+        }
+        
 
         $stmt->bind_param("i", $sectionId);
         $success = $stmt->execute();
