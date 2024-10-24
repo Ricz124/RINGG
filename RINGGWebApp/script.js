@@ -1,4 +1,4 @@
-function remSec(sectionId) {
+function remSec(sectionId) { 
     const data = { sectionId: sectionId };
 
     fetch('php/remove_section.php', {
@@ -9,35 +9,27 @@ function remSec(sectionId) {
         body: JSON.stringify(data)
     })
     .then(response => {
-        // Verifique se a resposta é OK
         if (!response.ok) {
             throw new Error('Erro na rede: ' + response.status);
         }
-        return response.text(); // Obtenha a resposta como texto
+        return response.json();
     })
     .then(data => {
-        console.log('Resposta do servidor:', data); // Veja a resposta bruta do servidor
-        try {
-            const jsonData = JSON.parse(data); // Tente analisar como JSON
-            if (jsonData.status === 'success') {
-                console.log('Seção removida com sucesso:', jsonData);
-                // Remove a seção do DOM após a resposta bem-sucedida
-                const sectionElement = document.getElementById(sectionId);
-                if (sectionElement) {
-                    sectionElement.remove();
-                }
-            } else {
-                console.error('Erro ao remover a seção:', jsonData.message);
+        if (data.status === 'success') {
+            console.log('Seção removida com sucesso:', data);
+            // Remove a seção do DOM após a resposta bem-sucedida
+            const sectionElement = document.getElementById(sectionId);
+            if (sectionElement) {
+                sectionElement.remove();
             }
-        } catch (e) {
-            console.error('Erro ao analisar JSON:', e);
+        } else {
+            console.error('Erro ao remover a seção:', data.message);
         }
     })
     .catch(error => {
         console.error('Erro ao remover a seção:', error);
     });
 }
-
 
 
 // Função para adicionar uma nova seção

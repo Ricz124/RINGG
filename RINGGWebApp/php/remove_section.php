@@ -8,7 +8,6 @@ if ($conn->connect_error) {
 }
 echo "Conectado com sucesso";
 $conn->close();
-?>
 
 header('Content-Type: application/json');
 
@@ -22,7 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($sectionId) {
         // Conexão com o banco de dados
-        $conn = new mysqli('host', 'user', 'password', 'database'); // Atualize com seus dados
+        $conn = new mysqli('your_host', 'your_user', 'your_password', 'your_database'); // Atualize com seus dados
 
         // Verifique a conexão
         if ($conn->connect_error) {
@@ -76,5 +75,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         "message" => "Método HTTP inválido."
     ]);
 }
-ob_end_flush(); // Envia a saída do buffer
 ?>
