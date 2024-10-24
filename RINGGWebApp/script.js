@@ -1,4 +1,4 @@
-function remSec(sectionId) { // Modificado para aceitar apenas o sectionId
+function remSec(sectionId) {
     const data = { sectionId: sectionId };
 
     fetch('php/remove_section.php', {
@@ -6,13 +6,17 @@ function remSec(sectionId) { // Modificado para aceitar apenas o sectionId
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify(data) // O corpo da requisição deve ser passado aqui
+        body: JSON.stringify(data)
     })
     .then(response => {
-        return response.text(); // Mude para text() para ver a resposta bruta
+        // Verifique se a resposta é OK
+        if (!response.ok) {
+            throw new Error('Erro na rede: ' + response.status);
+        }
+        return response.text(); // Obtenha a resposta como texto
     })
     .then(data => {
-        console.log('Resposta do servidor:', data); // Veja o que está sendo retornado
+        console.log('Resposta do servidor:', data); // Veja a resposta bruta do servidor
         try {
             const jsonData = JSON.parse(data); // Tente analisar como JSON
             if (jsonData.status === 'success') {
@@ -33,6 +37,7 @@ function remSec(sectionId) { // Modificado para aceitar apenas o sectionId
         console.error('Erro ao remover a seção:', error);
     });
 }
+
 
 
 // Função para adicionar uma nova seção
