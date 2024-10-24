@@ -38,6 +38,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($data['sectionId'])) {
     echo json_encode([
         "status" => "error",
         "message" => "Método HTTP inválido ou ID não especificado."
+        
     ]);
+    error_log("Seção ID: " . $sectionId);
+    error_log("Erro SQL: " . $stmt->error);
 }
 ?>
