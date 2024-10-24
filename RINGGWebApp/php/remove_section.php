@@ -1,4 +1,7 @@
 <?php
+include '../session_start.php';
+require 'db_connections.php';
+
 header('Content-Type: application/json');
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
