@@ -4,12 +4,16 @@ require 'db_connections.php';
 
 header('Content-Type: application/json');
 
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $data = json_decode(file_get_contents("php://input"), true);
     $sectionId = $data['sectionId'] ?? null;
 
     if ($sectionId) {
-        // Aqui você deve definir a conexão com o banco de dados
+        // Conexão com o banco de dados
         $conn = new mysqli('host', 'user', 'password', 'database'); // Atualize com seus dados
 
         // Verifique a conexão
@@ -21,6 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit();
         }
 
+        // Preparar a consulta
         $query = "DELETE FROM sections WHERE id = ?";
         $stmt = $conn->prepare($query);
 
@@ -32,6 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit();
         }
 
+        // Vincular o parâmetro e executar
         $stmt->bind_param("i", $sectionId);
         $success = $stmt->execute();
 
@@ -47,6 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ]);
         }
 
+        // Fechar a declaração e a conexão
         $stmt->close();
         $conn->close();
     } else {
