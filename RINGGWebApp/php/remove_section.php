@@ -6,68 +6,38 @@ error_reporting(E_ALL);
 include '../session_start.php';
 require 'db_connections.php';
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $input = file_get_contents('php://input');
-    $data = json_decode($input, true);
-    print_r($data); // Para ver o que está sendo recebido
+// Obtenha os dados do corpo da requisição
+$input = file_get_contents("php://input");
+$data = json_decode($input, true);
 
-    if (json_last_error() !== JSON_ERROR_NONE) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($data['sectionId'])) {
+    $sectionId = $data['sectionId'];
+
+    // Prepare a consulta SQL
+    $query = "DELETE FROM sections WHERE id = ?";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("i", $sectionId);
+    
+    if ($stmt->execute()) {
+        // Responda com JSON se a remoção for bem-sucedida
         echo json_encode([
-            "status" => "error",
-            "message" => "JSON inválido."
+            "status" => "success",
+            "message" => "Seção removida com sucesso."
         ]);
-        exit;
-    }
-
-    $sectionId = $data['sectionId'] ?? null;
-
-    if ($sectionId) {
-        $query = "DELETE FROM sections WHERE id = ?";
-        $stmt = $conn->prepare($query);
-
-        if ($stmt === false) {
-            echo json_encode([
-                "status" => "error",
-                "message" => "Erro na preparação da consulta: " . $conn->error
-            ]);
-            exit;
-        }
-
-        if ($stmt->execute()) {
-            // Código para sucesso
-        } else {
-            http_response_code(500); // Código de erro interno
-            echo json_encode([
-                "status" => "error",
-                "message" => "Erro ao remover a seção: " . $stmt->error
-            ]);
-        }
-        
-
-        $stmt->bind_param("i", $sectionId);
-        $success = $stmt->execute();
-
-        if ($success) {
-            echo json_encode([
-                "status" => "success",
-                "message" => "Seção removida com sucesso."
-            ]);
-        } else {
-            echo json_encode([
-                "status" => "error",
-                "message" => "Erro ao remover a seção: " . $stmt->error
-            ]);
-        }
     } else {
+        // Responda com erro se a remoção falhar
+        http_response_code(500);
         echo json_encode([
             "status" => "error",
-            "message" => "ID não especificado."
+            "message" => "Erro ao remover a seção: " . $stmt->error
         ]);
     }
 } else {
+    // Responda com erro se o método não for POST ou o ID não estiver especificado
+    http_response_code(400);
     echo json_encode([
         "status" => "error",
-        "message" => "Método HTTP inválido. Use POST."
+        "message" => "Método HTTP inválido ou ID não especificado."
     ]);
 }
 ?>
