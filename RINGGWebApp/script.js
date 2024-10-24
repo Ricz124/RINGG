@@ -6,30 +6,34 @@ function remSec(sectionId) { // Modificado para aceitar apenas o sectionId
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify(data)
+        body: JSON.stringify(data) // O corpo da requisição deve ser passado aqui
     })
     .then(response => {
-        if (!response.ok) {
-            throw new Error('Erro na rede: ' + response.status);
-        }
-        return response.json();
+        return response.text(); // Mude para text() para ver a resposta bruta
     })
     .then(data => {
-        if (data.status === 'success') {
-            console.log('Seção removida com sucesso:', data);
-            // Remove a seção do DOM após a resposta bem-sucedida
-            const sectionElement = document.getElementById(sectionId);
-            if (sectionElement) {
-                sectionElement.remove();
+        console.log('Resposta do servidor:', data); // Veja o que está sendo retornado
+        try {
+            const jsonData = JSON.parse(data); // Tente analisar como JSON
+            if (jsonData.status === 'success') {
+                console.log('Seção removida com sucesso:', jsonData);
+                // Remove a seção do DOM após a resposta bem-sucedida
+                const sectionElement = document.getElementById(sectionId);
+                if (sectionElement) {
+                    sectionElement.remove();
+                }
+            } else {
+                console.error('Erro ao remover a seção:', jsonData.message);
             }
-        } else {
-            console.error('Erro ao remover a seção:', data.message);
+        } catch (e) {
+            console.error('Erro ao analisar JSON:', e);
         }
     })
     .catch(error => {
         console.error('Erro ao remover a seção:', error);
     });
 }
+
 
 // Função para adicionar uma nova seção
 function addSec() {
