@@ -2,11 +2,11 @@ function remSec(button, sectionId) {
     const data = { sectionId: sectionId };
 
     fetch('php/remove_section.php', {
-        method: 'POST',
+        method: 'POST',  // Certifique-se de que é POST
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify(data)
+        body: JSON.stringify(data) // Certifique-se de que está enviando os dados corretamente
     })
     .then(response => {
         if (!response.ok) {
@@ -26,6 +26,7 @@ function remSec(button, sectionId) {
         console.error('Erro ao remover a seção:', error);
     });
 }
+
 
 
 // Função para mover a seção para a esquerda
