@@ -11,9 +11,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($data['sectionId'])) {
         $sectionId = $data['sectionId'];
 
+        // Validar se o sectionId é um número
+        if (!is_numeric($sectionId)) {
+            http_response_code(400);
+            echo json_encode([
+                "status" => "error",
+                "message" => "ID da seção deve ser um número."
+            ]);
+            exit();
+        }
+
         // Prepara a consulta SQL para deletar a seção
         $query = "DELETE FROM sections WHERE id = ?";
         $stmt = $conn->prepare($query);
+
+        // Verifique se a preparação da consulta falhou
+        if (!$stmt) {
+            http_response_code(500);
+            echo json_encode([
+                "status" => "error",
+                "message" => "Erro na preparação da consulta: " . $conn->error
+            ]);
+            exit();
+        }
+
         $stmt->bind_param("i", $sectionId); // O ID da seção deve ser um inteiro
 
         // Execute a consulta
@@ -22,17 +43,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             echo json_encode([
                 "status" => "success",
                 "message" => "Seção removida com sucesso."
-                error_log("Iniciando remoção da seção com ID: " . $sectionId);
-
             ]);
         } else {
             // Erro ao executar a consulta
             http_response_code(500);
             echo json_encode([
                 "status" => "error",
-                "message" => "Erro ao executar a remoção no banco de dados."
-                error_log("Iniciando remoção da seção com ID: " . $sectionId);
-
+                "message" => "Erro ao executar a remoção no banco de dados: " . $stmt->error
             ]);
         }
     } else {
@@ -41,8 +58,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         echo json_encode([
             "status" => "error",
             "message" => "ID da seção não especificado."
-            error_log("Iniciando remoção da seção com ID: " . $sectionId);
-
         ]);
     }
 } else {
@@ -51,8 +66,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     echo json_encode([
         "status" => "error",
         "message" => "Método HTTP inválido. Use POST."
-        error_log("Iniciando remoção da seção com ID: " . $sectionId);
-
     ]);
 }
 ?>

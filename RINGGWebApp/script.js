@@ -1,5 +1,5 @@
 function remSec(button, sectionId) {
-    const data = {sectionId: sectionId };
+    const data = { sectionId: sectionId };
 
     fetch('php/remove_section.php', {
         method: 'POST',
@@ -17,6 +17,7 @@ function remSec(button, sectionId) {
     .then(data => {
         if (data.status === 'success') {
             console.log('Seção removida com sucesso:', data);
+            button.parentElement.remove(); // Remove a seção do DOM
         } else {
             console.error('Erro ao remover a seção:', data.message);
         }
@@ -25,7 +26,6 @@ function remSec(button, sectionId) {
         console.error('Erro ao remover a seção:', error);
     });
 }
-
 
 
 // Função para mover a seção para a esquerda
