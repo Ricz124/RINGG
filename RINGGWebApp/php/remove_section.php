@@ -1,17 +1,35 @@
 <?php
-header('Content-Type: application/json'); // Certifique-se de que o cabeçalho está configurado corretamente
+header('Content-Type: application/json');
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Lê os dados do corpo da requisição
     $data = json_decode(file_get_contents("php://input"), true);
     $sectionId = $data['sectionId'] ?? null;
 
     if ($sectionId) {
-        // Conexão com o banco de dados e remoção da seção
-        // Supondo que $conn seja sua conexão com o banco de dados
+        // Aqui você deve definir a conexão com o banco de dados
+        $conn = new mysqli('host', 'user', 'password', 'database'); // Atualize com seus dados
+
+        // Verifique a conexão
+        if ($conn->connect_error) {
+            echo json_encode([
+                "status" => "error",
+                "message" => "Erro de conexão: " . $conn->connect_error
+            ]);
+            exit();
+        }
+
         $query = "DELETE FROM sections WHERE id = ?";
         $stmt = $conn->prepare($query);
-        $stmt->bind_param("i", $sectionId); // O ID deve ser um inteiro
+
+        if ($stmt === false) {
+            echo json_encode([
+                "status" => "error",
+                "message" => "Erro ao preparar a consulta: " . $conn->error
+            ]);
+            exit();
+        }
+
+        $stmt->bind_param("i", $sectionId);
         $success = $stmt->execute();
 
         if ($success) {
@@ -22,9 +40,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             echo json_encode([
                 "status" => "error",
-                "message" => "Erro ao remover a seção."
+                "message" => "Erro ao remover a seção: " . $stmt->error
             ]);
         }
+
+        $stmt->close();
+        $conn->close();
     } else {
         echo json_encode([
             "status" => "error",
