@@ -3,7 +3,11 @@ document.addEventListener("DOMContentLoaded", function () {
     const saveTasksButton = document.getElementById("save-tasks");
     const taskList = document.getElementById("task-list");
 
-    console.log(taskList); // Verifique se o elemento foi encontrado
+    // Verificação para garantir que o taskList não é null
+    if (!taskList) {
+        console.error("Elemento 'task-list' não encontrado!");
+        return;
+    }
 
     if (addTaskButton) {
         addTaskButton.addEventListener("click", function () {
@@ -73,7 +77,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     taskDiv.className = "task";
                     taskDiv.style.borderLeft = `5px solid ${task.priority}`;
                     taskDiv.innerHTML = `
-                        <h3>${task.title}</h3>
+                        <h3 contenteditable="true">${task.title}</h3>
                         <input type="checkbox"> ${task.checkbox_title}
                         <span>${task.start_date} - ${task.end_date}</span>
                         <button onclick="deleteTask(${task.id})">Remover</button>
