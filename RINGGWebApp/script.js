@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const endDate = document.getElementById("end-date").value;
 
             if (title && checkboxTitle && startDate && endDate) {
-                fetch("add_task.php", {
+                fetch("php/add_task.php", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -39,7 +39,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (saveTasksButton) {
         saveTasksButton.addEventListener("click", function () {
-            fetch("save_tasks.php", {
+            fetch("php/save_tasks.php", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -58,7 +58,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function loadTasks() {
-        fetch("fetch_tasks.php")
+        fetch("php/fetch_tasks.php")
             .then(response => response.json())
             .then(tasks => {
                 taskList.innerHTML = "";
@@ -78,7 +78,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     window.deleteTask = function (taskId) {
-        fetch("delete_task.php", {
+        fetch("php/delete_task.php", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -96,7 +96,7 @@ document.addEventListener("DOMContentLoaded", function () {
     };
 
     function deleteTask(taskId) {
-        fetch("delete_task.php", {
+        fetch("php/delete_task.php", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
