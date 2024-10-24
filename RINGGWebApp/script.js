@@ -1,89 +1,7 @@
-function remSec(button, sectionId) {
+function remSec(sectionId) { // Modificado para aceitar apenas o sectionId
     const data = { sectionId: sectionId };
 
     fetch('php/remove_section.php', {
-        method: 'POST', // Deve ser POST
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data) // Envia o ID da seção como JSON
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Erro na rede: ' + response.status);
-        }
-        return response.json();
-    })
-    .then(data => {
-        if (data.status === 'success') {
-            console.log('Seção removida com sucesso:', data);
-        } else {
-            console.error('Erro ao remover a seção:', data.message);
-        }
-    })
-    .catch(error => {
-        console.error('Erro ao remover a seção:', error);
-    });
-}
-
-// Função para mover a seção para a esquerda
-function mvEsq(button) {
-    const sec = button.parentElement;
-    const previousSec = sec.previousElementSibling;
-
-    if (previousSec && previousSec.classList.contains('sec')) {
-        sec.parentElement.insertBefore(sec, previousSec);
-    }
-}
-
-// Função para mover a seção para a direita
-function mvDir(button) {
-    const sec = button.parentElement;
-    const nextSec = sec.nextElementSibling;
-
-    if (nextSec && nextSec.classList.contains('sec')) {
-        sec.parentElement.insertBefore(nextSec, sec);
-    }
-}
-
-// Função para começar a edição do título
-function editTit(button, secTitId) {
-    const secTit = document.getElementById(secTitId);
-    const h3 = secTit.querySelector('h3');
-    const input = secTit.querySelector('input');
-    const editBtn = secTit.querySelector('button');
-    const saveBtn = editBtn.nextElementSibling;
-
-    h3.style.display = 'none';
-    input.style.display = 'inline';
-    input.value = h3.textContent;
-    editBtn.style.display = 'none';
-    saveBtn.style.display = 'inline';
-}
-
-// Função para salvar o novo título
-function saveTit(button, secTitId) {
-    const secTit = document.getElementById(secTitId);
-    const h3 = secTit.querySelector('h3');
-    const input = secTit.querySelector('input');
-    const saveBtn = button;
-    const editBtn = saveBtn.previousElementSibling;
-
-    h3.textContent = input.value;
-    h3.style.display = 'inline';
-    input.style.display = 'none';
-    saveBtn.style.display = 'none';
-    editBtn.style.display = 'inline';
-
-    // Salva a seção no banco de dados
-    saveSection(h3.textContent, secTitId);
-}
-
-// Função para salvar a seção
-function saveSection(sectionTitle, sectionId) {
-    const data = { sectionTitle: sectionTitle, sectionId: sectionId };
-
-    fetch('php/save_section.php', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -98,13 +16,18 @@ function saveSection(sectionTitle, sectionId) {
     })
     .then(data => {
         if (data.status === 'success') {
-            console.log('Seção salva com sucesso:', data);
+            console.log('Seção removida com sucesso:', data);
+            // Remove a seção do DOM após a resposta bem-sucedida
+            const sectionElement = document.getElementById(sectionId);
+            if (sectionElement) {
+                sectionElement.remove();
+            }
         } else {
-            console.error('Erro ao salvar a seção:', data.message);
+            console.error('Erro ao remover a seção:', data.message);
         }
     })
     .catch(error => {
-        console.error('Erro ao salvar a seção:', error);
+        console.error('Erro ao remover a seção:', error);
     });
 }
 
@@ -115,7 +38,7 @@ function addSec() {
 
     const newSec = document.createElement('div');
     newSec.classList.add('sec');
-    newSec.id = `sec${secCounter}`;
+    newSec.id = `sec${secCounter}`; // ID único para a seção
 
     newSec.innerHTML = `
         <div class="sec-tit" id="sec-tit${secCounter}">
@@ -130,17 +53,10 @@ function addSec() {
     `;
 
     container.appendChild(newSec);
-    
+
     // Salva a seção no servidor
     saveSection(`Nome ${secCounter}`, newSec.id);
 }
-
-// Inicializa o DOM
-document.addEventListener('DOMContentLoaded', () => {
-    loadSections();
-    const addButton = document.getElementById('sec-button-add');
-    addButton.addEventListener('click', addSec);
-});
 
 // Função para carregar seções
 function loadSections() {
@@ -182,3 +98,10 @@ function loadSections() {
             console.error('Erro ao buscar seções:', error);
         });
 }
+
+// Inicializa o DOM
+document.addEventListener('DOMContentLoaded', () => {
+    loadSections();
+    const addButton = document.getElementById('sec-button-add');
+    addButton.addEventListener('click', addSec);
+});
