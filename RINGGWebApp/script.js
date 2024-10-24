@@ -1,46 +1,28 @@
-function remSec(button) {
-    const secToRemove = button.closest('.sec'); // Encontrar o elemento pai com a classe 'sec'
+function remSec(button, sectionId) {
+    const data = {sectionId: sectionId };
 
-    // Verifica se secToRemove existe
-    if (!secToRemove) {
-        console.error('Elemento pai com a classe .sec não encontrado para o botão.');
-        return;
-    }
-
-    const sectionId = secToRemove.id;
-
-    // Verifica se o secToRemove tem um ID
-    if (!sectionId) {
-        console.error('ID não encontrado para a seção.');
-        return;
-    }
-
-    console.log('Removendo a seção com ID:', sectionId);
-
-    // Faz a requisição para remover a seção
     fetch('php/remove_section.php', {
-        method: 'DELETE',
+        method: 'POST',
         headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
+            'Content-Type': 'application/json',
         },
-        body: `id=${encodeURIComponent(sectionId)}` // Envia o ID da seção no corpo
+        body: JSON.stringify(data)
     })
     .then(response => {
         if (!response.ok) {
-            throw new Error('Erro de rede: ' + response.statusText);
+            throw new Error('Erro na rede: ' + response.status);
         }
         return response.json();
     })
     .then(data => {
-        if (data.status === "success") {
-            secToRemove.remove(); // Remove a seção do DOM
-            console.log('Seção removida com sucesso');
+        if (data.status === 'success') {
+            console.log('Seção removida com sucesso:', data);
         } else {
-            console.error('Erro ao remover seção:', data.message);
+            console.error('Erro ao remover a seção:', data.message);
         }
     })
     .catch(error => {
-        console.error('Erro:', error);
+        console.error('Erro ao remover a seção:', error);
     });
 }
 
