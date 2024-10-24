@@ -2,47 +2,57 @@
 include '../session_start.php';
 require 'db_connections.php';
 
-// Verifica se o método da requisição é POST
+// Verifique se o método da requisição é POST
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Lê o corpo da requisição JSON
-    $input = file_get_contents('php://input');
-    $data = json_decode($input, true);
+    // Pegue o conteúdo do corpo da requisição
+    $data = json_decode(file_get_contents("php://input"), true);
 
-    // Verifica se o JSON foi decodificado corretamente e se o 'sectionId' foi fornecido
+    // Verifique se o ID da seção foi fornecido
     if (isset($data['sectionId'])) {
         $sectionId = $data['sectionId'];
 
-        // Preparar e executar a consulta SQL para remover a seção
+        // Prepara a consulta SQL para deletar a seção
         $query = "DELETE FROM sections WHERE id = ?";
         $stmt = $conn->prepare($query);
-        $stmt->bind_param("i", $sectionId); // O ID deve ser um inteiro
-        $success = $stmt->execute();
+        $stmt->bind_param("i", $sectionId); // O ID da seção deve ser um inteiro
 
-        if ($success) {
-            // Retorna uma resposta JSON de sucesso
+        // Execute a consulta
+        if ($stmt->execute()) {
+            // Retorna sucesso
             echo json_encode([
                 "status" => "success",
                 "message" => "Seção removida com sucesso."
+                error_log("Iniciando remoção da seção com ID: " . $sectionId);
+
             ]);
         } else {
-            // Retorna uma resposta JSON de erro
+            // Erro ao executar a consulta
+            http_response_code(500);
             echo json_encode([
                 "status" => "error",
-                "message" => "Erro ao remover a seção no banco de dados."
+                "message" => "Erro ao executar a remoção no banco de dados."
+                error_log("Iniciando remoção da seção com ID: " . $sectionId);
+
             ]);
         }
     } else {
-        // Retorna erro se o 'sectionId' não for fornecido
+        // ID da seção não fornecido
+        http_response_code(400);
         echo json_encode([
             "status" => "error",
-            "message" => "ID da seção não fornecido."
+            "message" => "ID da seção não especificado."
+            error_log("Iniciando remoção da seção com ID: " . $sectionId);
+
         ]);
     }
 } else {
-    // Responde com erro se o método não for POST
+    // Método HTTP não suportado
+    http_response_code(405);
     echo json_encode([
         "status" => "error",
-        "message" => "Método HTTP inválido."
+        "message" => "Método HTTP inválido. Use POST."
+        error_log("Iniciando remoção da seção com ID: " . $sectionId);
+
     ]);
 }
 ?>
