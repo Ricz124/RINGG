@@ -6,10 +6,10 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
-$host = 'localhost';
-$db = 'gerenciador_tarefas';
-$user = 'root'; // seu usuário
-$pass = ''; // sua senha
+$host = 'sql103.byethost7.com';
+$db = 'b7_37575800_gerenciador_tarefas';
+$user = 'b7_37575800'; // seu usuário
+$pass = 'asdf1234ert'; // sua senha
 
 $pdo = new PDO("mysql:host=$host;dbname=$db", $user, $pass);
 $userId = $_SESSION['user_id'];
