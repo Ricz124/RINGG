@@ -1,7 +1,14 @@
 <?php
 ob_start(); // Inicia o buffer de saída
 include '../session_start.php'; // Certifique-se de que isso não causa problemas
-require 'db_connections.php';
+$conn = new mysqli('sql103.byethost7.com', 'b7_37575800', 'asdf1234ert', 'b7_37575800_workspace_db');
+
+if ($conn->connect_error) {
+    die("Conexão falhou: " . $conn->connect_error);
+}
+echo "Conectado com sucesso";
+$conn->close();
+?>
 
 header('Content-Type: application/json');
 
