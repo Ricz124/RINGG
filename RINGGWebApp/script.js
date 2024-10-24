@@ -1,4 +1,5 @@
 function remSec(button, sectionId) {
+    console.log('Tentando remover a seção:', sectionId);
     const data = { sectionId: sectionId };
 
     fetch('php/remove_section.php', {
