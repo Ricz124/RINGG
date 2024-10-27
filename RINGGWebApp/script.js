@@ -18,7 +18,7 @@ document.addEventListener("DOMContentLoaded", () => {
 function addColumn() {
     const board = document.getElementById("board");
     const columnCount = board.children.length + 1;
-  
+
     const column = document.createElement("div");
     column.className = "column";
     column.draggable = true;
@@ -30,11 +30,11 @@ function addColumn() {
       <input type="text" onblur="saveColumnTitle(this)" style="display: none;">
       <div class="card-container" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
       <button onclick="addCard(this)">Adicionar Card</button>
-      <button onclick="deleteColumn(this)">Deletar Coluna</button> <!-- Botão para deletar coluna -->
+      <button onclick="deleteColumn(this)">Deletar Coluna</button>
     `;
-  
+
     board.appendChild(column);
-  }
+}
 
 // Função para adicionar um novo cartão
 function addCard(button) {
@@ -101,15 +101,14 @@ function openModal(card) {
 
 function closeModal() {
     document.getElementById("cardModal").style.display = "none";
-    
+
     // Salvar a data de prazo
     if (activeCard) {
       activeCard.dataset.dueDate = document.getElementById("dueDate").value; // Salvar data de prazo
     }
     
     saveCheckboxes();
-  }
-  
+}
 
 // Função para salvar o título do card
 function saveCardTitle(input) {
@@ -205,10 +204,19 @@ function deleteCheckboxes() {
         taskList.removeChild(checkbox.parentElement); // Remove a tarefa
       }
     });
-  }
-  
-  function deleteColumn(button) {
+}
+
+function deleteColumn(button) {
     const column = button.parentElement; // Obter a coluna pai
     column.remove(); // Remover a coluna do DOM
-  }
-  
+}
+
+// Função para deletar o card ativo
+function deleteCard() {
+    if (activeCard) {
+        // Remove o card do DOM
+        const cardContainer = activeCard.parentNode; // Obtém o container do card
+        cardContainer.removeChild(activeCard); // Remove o card do container
+        closeModal(); // Fecha o modal após deletar o card
+    }
+}
