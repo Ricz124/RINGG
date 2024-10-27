@@ -34,6 +34,27 @@ function addColumn() {
     `;
 
     board.appendChild(column);
+
+    // Salvar a nova coluna no banco de dados
+    saveColumnToDB(`Coluna ${columnCount}`);
+}
+
+function saveColumnToDB(title) {
+    fetch('php/save_column.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            title: title,
+            userId: sessionStorage.getItem('user_id'), // Supondo que você armazena o ID do usuário na sessão
+            orderIndex: document.getElementById("board").children.length
+        }),
+    }).then(response => response.json()).then(data => {
+        console.log(data);
+    }).catch((error) => {
+        console.error('Erro:', error);
+    });
 }
 
 // Função para adicionar um novo cartão
@@ -52,6 +73,30 @@ function addCard(button) {
                       <input type="text" onblur="saveCardTitle(this)" style="display: none;">`;
 
     cardContainer.appendChild(card);
+
+    // Salvar o novo cartão no banco de dados
+    saveCardToDB(card);
+}
+
+function saveCardToDB(card) {
+    fetch('php/save_card.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            title: card.querySelector(".card-title").textContent,
+            userId: sessionStorage.getItem('user_id'), // ID do usuário
+            columnId: card.parentNode.previousElementSibling.innerText.replace('Coluna ', ''),
+            dueDate: card.dataset.dueDate || null,
+            color: card.dataset.color,
+            tasks: card.dataset.tasks || []
+        }),
+    }).then(response => response.json()).then(data => {
+        console.log(data);
+    }).catch((error) => {
+        console.error('Erro:', error);
+    });
 }
 
 // Funções de arrastar e soltar colunas e cartões
@@ -209,14 +254,53 @@ function deleteCheckboxes() {
 function deleteColumn(button) {
     const column = button.parentElement; // Obter a coluna pai
     column.remove(); // Remover a coluna do DOM
+
+    // Marcar a coluna como deletada no banco de dados
+    deleteColumnFromDB(column.querySelector("h2").textContent);
 }
 
-// Função para deletar o card ativo
+function deleteColumnFromDB(title) {
+    fetch('php/delete_column.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            title: title,
+            userId: sessionStorage.getItem('user_id')
+        }),
+    }).then(response => response.json()).then(data => {
+        console.log(data);
+    }).catch((error) => {
+        console.error('Erro:', error);
+    });
+}
+
 function deleteCard() {
     if (activeCard) {
         // Remove o card do DOM
         const cardContainer = activeCard.parentNode; // Obtém o container do card
         cardContainer.removeChild(activeCard); // Remove o card do container
         closeModal(); // Fecha o modal após deletar o card
+
+        // Marcar o card como deletado no banco de dados
+        deleteCardFromDB(activeCard.querySelector(".card-title").textContent);
     }
+}
+
+function deleteCardFromDB(title) {
+    fetch('php/delete_card.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            title: title,
+            userId: sessionStorage.getItem('user_id')
+        }),
+    }).then(response => response.json()).then(data => {
+        console.log(data);
+    }).catch((error) => {
+        console.error('Erro:', error);
+    });
 }
