@@ -22,7 +22,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 return;
             }
 
-            fetch("RINGGWebApp/php/add_task.php", {
+            fetch("php/add_task.php", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -49,7 +49,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (saveTasksButton) {
         saveTasksButton.addEventListener("click", function () {
-            fetch("RINGGWebApp/php/save_tasks.php", {
+            fetch("php/save_tasks.php", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -68,7 +68,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function loadTasks() {
-        fetch("RINGGWebApp/php/fetch_tasks.php")
+        fetch("php/fetch_tasks.php")
             .then(response => response.json())
             .then(tasks => {
                 taskList.innerHTML = ""; // Limpa a lista antes de adicionar
@@ -88,7 +88,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     window.deleteTask = function (taskId) {
-        fetch("RINGGWebApp/php/delete_task.php", {
+        fetch("php/delete_task.php", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
