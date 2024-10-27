@@ -93,6 +93,42 @@ nav{
   border: 3px solid #53B8A6;
 }
 
+footer {
+  background-color: #53B8A6; /* Cor de fundo do footer */
+  color: white; /* Cor do texto */
+  text-align: center; /* Alinhamento do texto */
+  padding: 20px 0; /* Espaçamento interno */
+  position: relative; /* Para que não seja fixo */
+  bottom: 0; /* Alinha ao fundo do documento */
+  width: 100%; /* Largura total */
+  margin-top: 20px; /* Espaçamento superior */
+}
+
+.footer-content {
+  max-width: 1200px; /* Largura máxima do conteúdo */
+  margin: auto; /* Centraliza o conteúdo */
+}
+
+.footer-links {
+  list-style: none; /* Remove os marcadores */
+  padding: 0; /* Remove o padding */
+}
+
+.footer-links li {
+  display: inline; /* Exibe os links em linha */
+  margin: 0 15px; /* Espaçamento entre os links */
+}
+
+.footer-links a {
+  color: white; /* Cor do texto do link */
+  text-decoration: none; /* Remove o sublinhado */
+}
+
+.footer-links a:hover {
+  text-decoration: underline; /* Adiciona sublinhado ao passar o mouse */
+}
+
+
 @media screen and (max-width: 890px) {
 
   .navbar{

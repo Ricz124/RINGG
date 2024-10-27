@@ -1,6 +1,7 @@
 <?php
 session_start();
 require 'db.php';
+include 'nav.php';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $email = $_POST['email'];
@@ -39,5 +40,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         <button type="submit">Login</button>
     </form>
+
+    <footer>
+      <div class="footer-content">
+        <p>&copy; 2024 RINGG. Todos os direitos reservados.</p>
+        <ul class="footer-links">
+          <li><a href="quemsomos.html">Quem Somos</a></li>
+          <li><a href="ajuda.html">Ajuda</a></li>
+          <li><a href="login.html">Entrar</a></li>
+        </ul>
+      </div>
+    </footer>
+
+    
 </body>
 </html>
