@@ -18,7 +18,7 @@ document.addEventListener("DOMContentLoaded", () => {
 function addColumn() {
     const board = document.getElementById("board");
     const columnCount = board.children.length + 1;
-
+  
     const column = document.createElement("div");
     column.className = "column";
     column.draggable = true;
@@ -26,14 +26,15 @@ function addColumn() {
     column.ondragover = allowDrop;
     column.ondrop = dropColumn;
     column.innerHTML = `
-        <h2 onclick="editColumnTitle(this)">Coluna ${columnCount}</h2>
-        <input type="text" onblur="saveColumnTitle(this)" style="display: none;">
-        <div class="card-container" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
-        <button onclick="addCard(this)">Adicionar Card</button>
+      <h2 onclick="editColumnTitle(this)">Coluna ${columnCount}</h2>
+      <input type="text" onblur="saveColumnTitle(this)" style="display: none;">
+      <div class="card-container" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+      <button onclick="addCard(this)">Adicionar Card</button>
+      <button onclick="deleteColumn(this)">Deletar Coluna</button> <!-- Botão para deletar coluna -->
     `;
-
+  
     board.appendChild(column);
-}
+  }
 
 // Função para adicionar um novo cartão
 function addCard(button) {
@@ -204,5 +205,10 @@ function deleteCheckboxes() {
         taskList.removeChild(checkbox.parentElement); // Remove a tarefa
       }
     });
+  }
+  
+  function deleteColumn(button) {
+    const column = button.parentElement; // Obter a coluna pai
+    column.remove(); // Remover a coluna do DOM
   }
   
