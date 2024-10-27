@@ -43,6 +43,7 @@
           <h2>Coluna 1</h2>
           <div class="card-container" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
           <button onclick="addCard(this)">Adicionar Card</button>
+          <button onclick="deleteColumn(this)">Deletar Coluna</button> <!-- Botão para deletar coluna -->
         </div>
       </main>
     
@@ -58,18 +59,15 @@
           <label for="dueDate">Data de Prazo:</label>
           <input type="date" id="dueDate">
 
-    
           <h3>Lista de Tarefas</h3>
           <ul id="taskList"></ul>
           <button onclick="addCheckbox()">Adicionar Tarefa</button>
-          <button onclick="deleteCheckboxes()">Deletar Tarefas Selecionadas</button>
-           <ul id="taskList"></ul>
+          <button onclick="deleteCheckboxes()">Deletar Tarefas Selecionadas</button> <!-- Botão para deletar checkboxes -->
     
           <h3>Cor do Card</h3>
           <input type="color" id="cardColorPicker" onchange="changeCardColor()">
         </div>
       </div>
-    
     
 </body>
 </html>
