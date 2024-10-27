@@ -5,9 +5,9 @@ $user = 'b7_37575800';
 $pass = 'asdf1234ert';
 
 try {
-    $conn = new PDO("mysql:host=$host;dbname=$db", $user, $pass);
-    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $pdo = new PDO("mysql:host=$host;dbname=$db", $user, $pass);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 } catch (PDOException $e) {
-    echo "Conexão falhou: " . $e->getMessage();
+    die("Erro de conexão: " . $e->getMessage());
 }
 ?>

@@ -5,6 +5,7 @@ let activeCard = null;
 document.addEventListener("DOMContentLoaded", () => {
     // Carrega as colunas e cards salvos no banco de dados
     loadColumnsAndCards();
+    loadFromLocalStorage();
 
     // Salvar título do card a partir do modal, após o DOM estar carregado
     const cardTitleInput = document.getElementById("cardTitle");
@@ -40,6 +41,7 @@ function addColumn() {
 
     // Salvar a nova coluna no banco de dados
     saveColumnToDB(`Coluna ${columnCount}`);
+    saveStateToLocalStorage() // salva o estado atualizado
 }
 
 function saveColumnToDB(title) {
@@ -79,6 +81,7 @@ function addCard(button) {
 
     // Salvar o novo cartão no banco de dados
     saveCardToDB(card);
+    saveStateToLocalStorage() // salva o estado atualizado
 }
 
 function saveCardToDB(card) {
@@ -115,10 +118,12 @@ function dropColumn(event) {
         board.insertBefore(draggedColumn, targetColumn.nextSibling);
         draggedColumn = null;
     }
+    saveStateToLocalStorage() // salva o estado atualizado
 }
 
 function dragCard(event) {
     draggedCard = event.target;
+    
 }
 
 function dropCard(event) {
@@ -129,6 +134,7 @@ function dropCard(event) {
         parent.insertBefore(draggedCard, targetCard.nextSibling);
         draggedCard = null;
     }
+    saveStateToLocalStorage() // salva o estado atualizado
 }
 
 function allowDrop(event) {
@@ -145,6 +151,7 @@ function openModal(card) {
     document.getElementById("cardColorPicker").value = card.dataset.color;
 
     loadCheckboxes();
+    saveStateToLocalStorage() // salva o estado atualizado
 }
 
 function closeModal() {
@@ -156,6 +163,7 @@ function closeModal() {
     }
     
     saveCheckboxes();
+    saveStateToLocalStorage() // salva o estado atualizado
 }
 
 // Função para salvar o título do card
@@ -164,6 +172,7 @@ function saveCardTitle(input) {
     cardTitle.textContent = input.value;
     input.style.display = "none";
     cardTitle.style.display = "inline";
+    
 }
 
 // Função para editar o título do card
@@ -198,6 +207,7 @@ function addCheckbox() {
     const li = document.createElement("li");
     li.innerHTML = `<input type="checkbox"> <input type="text" placeholder="Nova Tarefa">`;
     taskList.appendChild(li);
+    saveStateToLocalStorage() // salva o estado atualizado
 }
 
 // Função para carregar as tarefas salvas no modal
@@ -238,6 +248,7 @@ function changeCardColor() {
 // Salva tarefas ao fechar o modal
 window.onclick = function(event) {
     if (event.target === document.getElementById("cardModal")) {
+        saveStateToLocalStorage() // salva o estado atualizado
         closeModal();
     }
 };
@@ -251,15 +262,18 @@ function deleteCheckboxes() {
       if (checkbox.checked) {
         taskList.removeChild(checkbox.parentElement); // Remove a tarefa
       }
+      saveStateToLocalStorage() // salva o estado atualizado
     });
 }
 
 function deleteColumn(button) {
     const column = button.parentElement; // Obter a coluna pai
     column.remove(); // Remover a coluna do DOM
+    
 
     // Marcar a coluna como deletada no banco de dados
     deleteColumnFromDB(column.querySelector("h2").textContent);
+    saveStateToLocalStorage() // salva o estado atualizado
 }
 
 function deleteColumnFromDB(title) {
@@ -273,9 +287,15 @@ function deleteColumnFromDB(title) {
             userId: sessionStorage.getItem('user_id')
         }),
     }).then(response => response.json()).then(data => {
-        console.log(data);
+        console.log('Resposta do servidor:', data);
+        if (data.success) {
+            console.log('Coluna excluída com sucesso');
+            saveStateToLocalStorage(); // salva o estado atualizado
+        } else {
+            console.error('Erro ao excluir coluna:', data.message);
+        }
     }).catch((error) => {
-        console.error('Erro:', error);
+        console.error('Erro na requisição:', error);
     });
 }
 
@@ -288,6 +308,7 @@ function deleteCard() {
 
         // Marcar o card como deletado no banco de dados
         deleteCardFromDB(activeCard.querySelector(".card-title").textContent);
+        saveStateToLocalStorage() // salva o estado atualizado
     }
 }
 
@@ -309,15 +330,61 @@ function deleteCardFromDB(title) {
 }
 
 function loadColumnsAndCards() {
-    fetch('php/load_columns_cards.php', { // Ajuste o caminho se necessário
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-        },
+    fetch('php/load_column_cards.php')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                console.log('Dados carregados:', data.columns);
+                // Função para renderizar colunas e cards
+                renderColumns(data.columns);
+            } else {
+                console.error('Erro ao carregar colunas e cards:', data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Erro na requisição:', error);
+        });
+}
+
+
+fetch("http://ricardohoster.byethost7.com/RINGG/RINGGWebApp/php/load_columns_cards.php")
+    .then(response => response.text()) // Use `text()` para inspecionar a resposta como texto
+    .then(text => {
+        console.log("Raw response:", text);
+        return JSON.parse(text); // Converte o texto para JSON após a inspeção
     })
-    .then(response => response.json())
     .then(data => {
-        data.columns.forEach(columnData => {
+        // Processa os dados
+    })
+    .catch(error => {
+        console.error("Erro ao carregar colunas e cards:", error);
+    });
+
+    function saveStateToLocalStorage() {
+        const columns = Array.from(document.querySelectorAll(".column")).map(column => {
+            return {
+                title: column.querySelector("h2").textContent,
+                cards: Array.from(column.querySelectorAll(".card")).map(card => ({
+                    title: card.querySelector(".card-title").textContent,
+                    dueDate: card.dataset.dueDate,
+                    color: card.dataset.color,
+                    tasks: JSON.parse(card.dataset.tasks || "[]")
+                }))
+            };
+        });
+        localStorage.setItem("boardState", JSON.stringify(columns));
+    }
+    
+    // Chame `saveStateToLocalStorage()` toda vez que houver uma alteração
+
+    // Função para carregar colunas e cartões do localStorage
+function loadFromLocalStorage() {
+    const boardData = JSON.parse(localStorage.getItem("boardData"));
+    if (boardData) {
+        const board = document.getElementById("board");
+        board.innerHTML = ""; // Limpa o conteúdo atual
+
+        boardData.forEach(columnData => {
             const column = document.createElement("div");
             column.className = "column";
             column.draggable = true;
@@ -331,12 +398,10 @@ function loadColumnsAndCards() {
                 <button onclick="addCard(this)">Adicionar Card</button>
                 <button onclick="deleteColumn(this)">Deletar Coluna</button>
             `;
+            board.appendChild(column);
 
-            document.getElementById("board").appendChild(column);
-
-            // Carrega os cards da coluna
+            const cardContainer = column.querySelector(".card-container");
             columnData.cards.forEach(cardData => {
-                const cardContainer = column.querySelector(".card-container");
                 const card = document.createElement("div");
                 card.className = "card";
                 card.draggable = true;
@@ -345,18 +410,14 @@ function loadColumnsAndCards() {
                 card.ondrop = dropCard;
                 card.onclick = () => openModal(card);
                 card.dataset.creationDate = cardData.creationDate;
+                card.dataset.dueDate = cardData.dueDate;
                 card.dataset.color = cardData.color;
-                card.dataset.dueDate = cardData.dueDate || "";
-                card.dataset.tasks = JSON.stringify(cardData.tasks || []);
+                card.dataset.tasks = JSON.stringify(cardData.tasks);
+                card.style.backgroundColor = cardData.color;
                 card.innerHTML = `<span class="card-title" onclick="editCardTitle(this)">${cardData.title}</span>
                                   <input type="text" onblur="saveCardTitle(this)" style="display: none;">`;
-
-                card.style.backgroundColor = cardData.color;
                 cardContainer.appendChild(card);
             });
         });
-    })
-    .catch((error) => {
-        console.error('Erro ao carregar colunas e cards:', error);
-    });
+    }
 }
