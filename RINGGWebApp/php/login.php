@@ -40,6 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         <button type="submit">Login</button>
     </form>
+    <a href="register.php">Não tem cadastro?</a>
 
     <footer>
       <div class="footer-content">
@@ -52,6 +53,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
       </div>
     </footer>
 
-    
+
 </body>
 </html>
