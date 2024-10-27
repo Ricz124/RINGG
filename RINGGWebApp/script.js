@@ -3,6 +3,9 @@ let draggedColumn = null;
 let activeCard = null;
 
 document.addEventListener("DOMContentLoaded", () => {
+    // Carrega as colunas e cards salvos no banco de dados
+    loadColumnsAndCards();
+
     // Salvar título do card a partir do modal, após o DOM estar carregado
     const cardTitleInput = document.getElementById("cardTitle");
     if (cardTitleInput) {
@@ -302,5 +305,58 @@ function deleteCardFromDB(title) {
         console.log(data);
     }).catch((error) => {
         console.error('Erro:', error);
+    });
+}
+
+function loadColumnsAndCards() {
+    fetch('php/load_columns_cards.php', { // Ajuste o caminho se necessário
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        data.columns.forEach(columnData => {
+            const column = document.createElement("div");
+            column.className = "column";
+            column.draggable = true;
+            column.ondragstart = dragColumn;
+            column.ondragover = allowDrop;
+            column.ondrop = dropColumn;
+            column.innerHTML = `
+                <h2 onclick="editColumnTitle(this)">${columnData.title}</h2>
+                <input type="text" onblur="saveColumnTitle(this)" style="display: none;">
+                <div class="card-container" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+                <button onclick="addCard(this)">Adicionar Card</button>
+                <button onclick="deleteColumn(this)">Deletar Coluna</button>
+            `;
+
+            document.getElementById("board").appendChild(column);
+
+            // Carrega os cards da coluna
+            columnData.cards.forEach(cardData => {
+                const cardContainer = column.querySelector(".card-container");
+                const card = document.createElement("div");
+                card.className = "card";
+                card.draggable = true;
+                card.ondragstart = dragCard;
+                card.ondragover = allowDrop;
+                card.ondrop = dropCard;
+                card.onclick = () => openModal(card);
+                card.dataset.creationDate = cardData.creationDate;
+                card.dataset.color = cardData.color;
+                card.dataset.dueDate = cardData.dueDate || "";
+                card.dataset.tasks = JSON.stringify(cardData.tasks || []);
+                card.innerHTML = `<span class="card-title" onclick="editCardTitle(this)">${cardData.title}</span>
+                                  <input type="text" onblur="saveCardTitle(this)" style="display: none;">`;
+
+                card.style.backgroundColor = cardData.color;
+                cardContainer.appendChild(card);
+            });
+        });
+    })
+    .catch((error) => {
+        console.error('Erro ao carregar colunas e cards:', error);
     });
 }
