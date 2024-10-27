@@ -193,3 +193,16 @@ window.onclick = function(event) {
         closeModal();
     }
 };
+
+function deleteCheckboxes() {
+    const taskList = document.getElementById("taskList");
+    const checkboxes = taskList.querySelectorAll("input[type='checkbox']");
+    
+    // Filtrar as tarefas para remover aquelas que estão marcadas
+    checkboxes.forEach((checkbox, index) => {
+      if (checkbox.checked) {
+        taskList.removeChild(checkbox.parentElement); // Remove a tarefa
+      }
+    });
+  }
+  
