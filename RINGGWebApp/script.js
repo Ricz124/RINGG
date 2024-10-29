@@ -1,6 +1,9 @@
 let draggedCard = null;
 let draggedColumn = null;
 let activeCard = null;
+const state = {
+    columns: [] // Inicializa o estado das colunas
+};
 
 document.addEventListener("DOMContentLoaded", () => {
     // Carrega as colunas e cards salvos no banco de dados
