@@ -380,6 +380,65 @@ function deleteCardFromDB(title) {
     });
 }
 
+// Função auxiliar para criar um elemento <li> de tarefa
+function createTaskElement(task) {
+    const li = document.createElement("li");
+    li.innerHTML = `<input type="checkbox" ${task.completed ? "checked" : ""}> <input type="text" value="${task.text}" placeholder="Nova tarefa">`;
+    return li;
+}
+
+// Função para salvar tarefas no backend e atualizar o dataset local do card
+function saveCheckboxes() {
+    const taskList = document.getElementById("taskList").children;
+    const tasks = Array.from(taskList).map(li => ({
+        text: li.querySelector("input[type='text']").value.trim(),
+        completed: li.querySelector("input[type='checkbox']").checked,
+    })).filter(task => task.text !== ""); // Filtra tarefas vazias
+
+    if (activeCard) {
+        // Atualiza o dataset com as tarefas em JSON
+        activeCard.dataset.tasks = JSON.stringify(tasks);
+
+        // Salvar tarefas no backend via PHP
+        postData('php/save_card_tasks.php', {
+            cardId: activeCard.dataset.id,
+            tasks: tasks
+        })
+        .then(data => console.log('Tarefas salvas:', data))
+        .catch(error => {
+            console.error('Erro ao salvar tarefas:', error);
+            alert('Erro ao salvar as tarefas. Tente novamente.');
+        });
+    }
+}
+
+// Função auxiliar para comunicação com o backend
+function postData(url = '', data = {}) {
+    return fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    }).then(response => response.json());
+}
+
+// Carrega as tarefas do JSON para o modal do card
+function loadCheckboxes() {
+    const taskList = document.getElementById("taskList");
+    taskList.innerHTML = "";
+
+    // Carrega as tarefas do dataset do card ativo
+    const tasks = activeCard?.dataset.tasks ? JSON.parse(activeCard.dataset.tasks) : [];
+
+    // Adiciona cada tarefa ao modal
+    tasks.forEach(task => {
+        const taskElement = createTaskElement(task);
+        taskList.appendChild(taskElement);
+    });
+}
+
+
 function loadColumnsAndCards() {
     fetch('php/load_columns_cards.php')
         .then(response => response.json())
