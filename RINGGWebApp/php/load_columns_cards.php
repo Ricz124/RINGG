@@ -12,7 +12,7 @@ $userId = $_SESSION['user_id'];
 
 try {
     $query = "SELECT * FROM columns WHERE user_id = :userId ORDER BY order_index";
-    $stmt = $pdo->prepare($query); // Alterado para $pdo
+    $stmt = $conn->prepare($query); // Alterado para $conn
     $stmt->bindParam(':userId', $userId, PDO::PARAM_INT);
     $stmt->execute();
     $columns = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -20,7 +20,7 @@ try {
     foreach ($columns as &$column) {
         $columnId = $column['id'];
         $cardQuery = "SELECT * FROM cards WHERE column_id = :columnId ORDER BY id";
-        $cardStmt = $pdo->prepare($cardQuery); // Alterado para $pdo
+        $cardStmt = $conn->prepare($cardQuery); // Alterado para $conn
         $cardStmt->bindParam(':columnId', $columnId, PDO::PARAM_INT);
         $cardStmt->execute();
         $cards = $cardStmt->fetchAll(PDO::FETCH_ASSOC);

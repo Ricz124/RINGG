@@ -1,6 +1,11 @@
 let draggedCard = null;
 let draggedColumn = null;
 let activeCard = null;
+let state = {
+    columns: [],
+    cards: []
+};
+
 
 document.addEventListener("DOMContentLoaded", () => {
     // Salvar título do card a partir do modal, após o DOM estar carregado
@@ -191,7 +196,7 @@ function editColumnTitle(titleElement) {
 
 // Função para adicionar uma nova tarefa no modal
 function addCheckbox() {
-    const taskList = document.getElementById("taskList");
+    const taskList = docuFment.getElementById("taskList");
     const li = document.createElement("li");
     li.innerHTML = `<input type="checkbox"> <input type="text" placeholder="Nova Tarefa">`;
     taskList.appendChild(li);
@@ -304,3 +309,77 @@ function deleteCardFromDB(title) {
         console.error('Erro:', error);
     });
 }
+
+// Adiciona esta função ao seu script.js
+function loadColumnsAndCards() {
+    fetch('php/load_columns_cards.php')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log(data); // Imprime o JSON no console
+            
+            if (data.success) {
+                const board = document.getElementById("board");
+                board.innerHTML = ""; // Limpa o quadro antes de carregar
+
+                // Adiciona cada coluna e seus cartões ao quadro
+                data.columns.forEach(column => {
+                    const columnDiv = document.createElement("div");
+                    columnDiv.className = "column";
+                    columnDiv.draggable = true;
+                    columnDiv.ondragstart = dragColumn;
+                    columnDiv.ondragover = allowDrop;
+                    columnDiv.ondrop = dropColumn;
+                    columnDiv.innerHTML = `
+                        <h2 onclick="editColumnTitle(this)">${column.title}</h2>
+                        <input type="text" onblur="saveColumnTitle(this)" style="display: none;">
+                        <div class="card-container" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+                        <button onclick="addCard(this)">Adicionar Card</button>
+                        <button onclick="deleteColumn(this)">Deletar Coluna</button>
+                    `;
+
+                    // Adiciona os cartões à coluna
+                    column.cards.forEach(card => {
+                        const cardDiv = document.createElement("div");
+                        cardDiv.className = "card";
+                        cardDiv.draggable = true;
+                        cardDiv.ondragstart = dragCard;
+                        cardDiv.ondragover = allowDrop;
+                        cardDiv.ondrop = dropCard;
+                        cardDiv.onclick = () => openModal(cardDiv);
+                        cardDiv.dataset.creationDate = new Date(card.creation_date).toLocaleDateString();
+                        cardDiv.dataset.color = card.color;
+                        cardDiv.innerHTML = `<span class="card-title" onclick="editCardTitle(this)">${card.title}</span>
+                                             <input type="text" onblur="saveCardTitle(this)" style="display: none;">`;
+
+                        columnDiv.querySelector(".card-container").appendChild(cardDiv);
+                    });
+
+                    board.appendChild(columnDiv);
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Erro ao carregar colunas e cartões:', error);
+        });
+}
+
+
+// Atualize o evento DOMContentLoaded para incluir a nova função
+document.addEventListener("DOMContentLoaded", () => {
+    const cardTitleInput = document.getElementById("cardTitle");
+    if (cardTitleInput) {
+        cardTitleInput.addEventListener("input", (event) => {
+            if (activeCard) {
+                activeCard.querySelector(".card-title").textContent = event.target.value;
+            }
+        });
+    }
+
+    // Carregar colunas e cartões
+    loadColumnsAndCards();
+});
