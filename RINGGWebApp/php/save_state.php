@@ -21,15 +21,16 @@ if (!isset($_SESSION['user_id'])) {
 $userId = $_SESSION['user_id'];
 
 // Recebe os dados do quadro via POST
-$data = json_decode(file_get_contents('php://input'), true);
+$inputData = file_get_contents('php://input');
+$data = json_decode($inputData, true);
 
 // Debug: Verifica se os dados foram recebidos corretamente
 if ($data === null) {
-    // Adiciona esta linha para ver o que está sendo recebido
-    error_log("Dados recebidos: " . file_get_contents('php://input')); // Loga a entrada
+    // Registra no log o conteúdo recebido
+    error_log("JSON recebido (raw): " . $inputData); // Verifique o JSON bruto
     echo json_encode([
         'success' => false,
-        'message' => 'Dados inválidos recebidos.'
+        'message' => 'Dados inválidos recebidos ou JSON malformado.'
     ]);
     exit;
 }
@@ -45,7 +46,7 @@ try {
     $clearColumnsStmt->execute();
 
     // Insere novas colunas e seus cartões
-    foreach ($data as $column) {
+    foreach ($data['columns'] as $column) { // Verifica se "columns" existe em $data
         // Insere a coluna
         $insertColumnQuery = "INSERT INTO columns (user_id, title) VALUES (:userId, :title)";
         $insertColumnStmt = $pdo->prepare($insertColumnQuery);
@@ -74,6 +75,7 @@ try {
 } catch (PDOException $e) {
     // Em caso de erro, reverte a transação
     $pdo->rollBack();
+    error_log("Erro ao salvar estado: " . $e->getMessage()); // Registra o erro no log
     echo json_encode([
         'success' => false,
         'message' => "Erro ao salvar o estado: " . $e->getMessage()
