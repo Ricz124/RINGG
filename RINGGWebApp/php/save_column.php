@@ -12,9 +12,11 @@ if (empty($title) || empty($userId)) {
     exit;
 }
 
-$sql = "INSERT INTO columns (user_id, title, order_index) VALUES (:user_id, :title, :order_index)";
-$stmt = $conn->prepare($sql);
-$stmt->execute([':user_id' => $userId, ':title' => $title, ':order_index' => $orderIndex]);
+// código para adicionar nova coluna
+$sql = "INSERT INTO columns (user_id, title, order_index, is_deleted) VALUES (?, ?, ?, 0)";
+$stmt = $pdo->prepare($sql);
+$stmt->execute([$userId, $title, $orderIndex]);
+
 
 echo json_encode(['status' => 'success']);
 ?>

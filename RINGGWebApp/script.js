@@ -56,11 +56,16 @@ function saveColumnToDB(title) {
         },
         body: JSON.stringify({
             title: title,
-            userId: sessionStorage.getItem('user_id'), // Supondo que você armazena o ID do usuário na sessão
+            userId: sessionStorage.getItem('user_id'),
             orderIndex: document.getElementById("board").children.length
         }),
     }).then(response => response.json()).then(data => {
         console.log(data);
+        if (data.status === 'success') {
+            loadColumnsAndCards(); // Recarrega as colunas após salvar
+        } else {
+            console.error("Erro ao salvar a coluna:", data.message);
+        }
     }).catch((error) => {
         console.error('Erro:', error);
     });
@@ -236,20 +241,40 @@ function editCardTitle(titleElement) {
 }
 
 // Função para salvar o título da coluna
-function saveColumnTitle(input, columnId) {
-    const columnTitle = input.previousElementSibling;
-    columnTitle.textContent = input.value;
-    input.style.display = "none";
-    columnTitle.style.display = "inline";
-    
-    // Atualiza o estado com o novo título
-    const column = state.columns.find(col => col.id === columnId);
-    if (column) {
-        column.title = input.value;
-    }
+function saveColumnTitle(input) {
+    const columnElement = input.closest('.column');
+    const newTitle = input.value;
+    const columnId = columnElement.id.split('-')[1]; // Obtém o ID da coluna
 
-    // Salva o novo estado no servidor
-    saveStateToJSON();
+    // Atualize o título no frontend
+    columnElement.querySelector('h3').textContent = newTitle;
+    input.style.display = 'none';
+
+    // Requisição para atualizar o título da coluna no banco de dados
+    fetch('php/update_column_title.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ id: columnId, title: newTitle })
+    })
+    .then(response => response.text()) // Inspecione a resposta como texto
+    .then(text => {
+        console.log("Resposta do servidor:", text); // Log da resposta bruta
+        try {
+            const data = JSON.parse(text); // Tente fazer o parse para JSON
+            if (data.success) {
+                console.log('Título da coluna atualizado com sucesso.');
+            } else {
+                console.error('Erro ao atualizar o título:', data.message);
+            }
+        } catch (error) {
+            console.error("Erro ao fazer parse do JSON:", error, text);
+        }
+    })
+    .catch(error => {
+        console.error('Erro na requisição:', error);
+    });
 }
 
 // Função para editar o título da coluna
@@ -429,6 +454,8 @@ function renderColumns(columns) {
     const container = document.getElementById('board'); // Certifique-se de que o ID está correto
     container.innerHTML = ''; // Limpa o conteúdo atual do quadro
 
+    console.log("Renderizando colunas:", columns); // Log para verificar colunas sendo renderizadas
+
     columns.forEach(column => {
         const columnElement = document.createElement('div');
         columnElement.classList.add('column');
@@ -443,7 +470,10 @@ function renderColumns(columns) {
         container.appendChild(columnElement);
 
         // Renderiza os cartões dentro da coluna
-        renderCards(column.cards, `cards-${column.id}`);
+        if (column.cards && column.cards.length > 0) {
+            console.log(`Renderizando cartões para a coluna ${column.id}:`, column.cards);
+            renderCards(column.cards, `cards-${column.id}`);
+        }
     });
 }
 
