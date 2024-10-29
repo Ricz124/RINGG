@@ -381,7 +381,7 @@ function deleteCardFromDB(title) {
 }
 
 function loadColumnsAndCards() {
-    fetch('php/load_column_cards.php')
+    fetch('php/load_columns_cards.php')
         .then(response => response.json())
         .then(data => {
             if (data.success) {
