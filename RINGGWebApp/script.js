@@ -236,11 +236,20 @@ function editCardTitle(titleElement) {
 }
 
 // Função para salvar o título da coluna
-function saveColumnTitle(input) {
+function saveColumnTitle(input, columnId) {
     const columnTitle = input.previousElementSibling;
     columnTitle.textContent = input.value;
     input.style.display = "none";
     columnTitle.style.display = "inline";
+    
+    // Atualiza o estado com o novo título
+    const column = state.columns.find(col => col.id === columnId);
+    if (column) {
+        column.title = input.value;
+    }
+
+    // Salva o novo estado no servidor
+    saveStateToJSON();
 }
 
 // Função para editar o título da coluna
@@ -390,6 +399,54 @@ function createTaskElement(task) {
     return li;
 }
 
+function renderCards(cards, containerId) {
+    const container = document.getElementById(containerId);
+    container.innerHTML = ''; // Limpa o conteúdo atual dos cartões
+
+    cards.forEach(card => {
+        const cardElement = document.createElement('div');
+        cardElement.classList.add('card');
+        cardElement.draggable = true;
+        cardElement.ondragstart = dragCard; // Função de arrastar (presumindo que existe)
+        cardElement.ondrop = dropCard; // Função de soltar (presumindo que existe)
+        cardElement.dataset.dueDate = card.dueDate || '';
+        cardElement.dataset.color = card.color || '#FFFFFF';
+        cardElement.dataset.tasks = JSON.stringify(card.tasks || []);
+
+        // Adiciona o conteúdo do cartão
+        cardElement.innerHTML = `
+            <span class="card-title" onclick="editCardTitle(this)">${card.title}</span>
+            <input type="text" onblur="saveCardTitle(this)" style="display: none;">
+        `;
+        cardElement.style.backgroundColor = card.color || '#FFFFFF'; // Define a cor
+
+        container.appendChild(cardElement); // Adiciona o cartão ao container
+    });
+}
+
+
+function renderColumns(columns) {
+    const container = document.getElementById('board'); // Certifique-se de que o ID está correto
+    container.innerHTML = ''; // Limpa o conteúdo atual do quadro
+
+    columns.forEach(column => {
+        const columnElement = document.createElement('div');
+        columnElement.classList.add('column');
+        columnElement.id = `column-${column.id}`;
+        columnElement.innerHTML = `
+            <h3 onclick="editColumnTitle(this)">${column.title}</h3>
+            <input type="text" onblur="saveColumnTitle(this)" style="display: none;">
+            <div class="card-container" id="cards-${column.id}"></div>
+            <button onclick="addCard(this)">Adicionar Card</button>
+            <button onclick="deleteColumn(this)">Deletar Coluna</button>
+        `;
+        container.appendChild(columnElement);
+
+        // Renderiza os cartões dentro da coluna
+        renderCards(column.cards, `cards-${column.id}`);
+    });
+}
+
 // Função para salvar tarefas no backend e atualizar o dataset local do card
 function saveCheckboxes() {
     const taskList = document.getElementById("taskList").children;
@@ -450,7 +507,7 @@ function loadColumnsAndCards() {
         try {
             const data = JSON.parse(text);
             if (data.success) {
-                // Processar os dados
+                renderColumns(data.columns); // Chamando a função de renderização
             } else {
                 console.error("Erro ao carregar colunas e cards:", data.message);
             }
