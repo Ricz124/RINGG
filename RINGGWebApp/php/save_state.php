@@ -23,6 +23,15 @@ $userId = $_SESSION['user_id'];
 // Recebe os dados do quadro via POST
 $data = json_decode(file_get_contents('php://input'), true);
 
+// Debug: Verifica se os dados foram recebidos corretamente
+if ($data === null) {
+    echo json_encode([
+        'success' => false,
+        'message' => 'Dados inválidos recebidos.'
+    ]);
+    exit;
+}
+
 try {
     // Começa uma transação para garantir a integridade dos dados
     $pdo->beginTransaction();

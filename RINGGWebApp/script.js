@@ -562,3 +562,26 @@ function saveStateToJSON() {
       .then(data => console.log('Dados salvos:', data))
       .catch(error => console.error('Erro ao salvar dados:', error));
 }
+
+function saveStateToServer() {
+    const stateToSave = JSON.stringify(state.columns); // Supondo que você tenha um objeto `state` com as colunas
+    console.log("Estado a ser salvo:", stateToSave); // Verifica os dados que estão sendo enviados
+    fetch('php/save_state.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: stateToSave
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            console.log(data.message);
+        } else {
+            console.error('Erro ao salvar estado:', data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Erro na requisição:', error);
+    });
+}
