@@ -25,6 +25,8 @@ $data = json_decode(file_get_contents('php://input'), true);
 
 // Debug: Verifica se os dados foram recebidos corretamente
 if ($data === null) {
+    // Adiciona esta linha para ver o que está sendo recebido
+    error_log("Dados recebidos: " . file_get_contents('php://input')); // Loga a entrada
     echo json_encode([
         'success' => false,
         'message' => 'Dados inválidos recebidos.'

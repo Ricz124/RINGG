@@ -564,24 +564,26 @@ function saveStateToJSON() {
 }
 
 function saveStateToServer() {
-    const stateToSave = JSON.stringify(state.columns); // Supondo que você tenha um objeto `state` com as colunas
+    const stateToSave = JSON.stringify(state.columns); // Serialize o estado como JSON
+
     console.log("Estado a ser salvo:", stateToSave); // Verifica os dados que estão sendo enviados
+
     fetch('php/save_state.php', {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json' // Especifica o tipo de conteúdo como JSON
         },
-        body: stateToSave
+        body: stateToSave // O corpo da requisição contém o JSON
     })
-    .then(response => response.json())
+    .then(response => response.json()) // Espera pela resposta e a converte para JSON
     .then(data => {
         if (data.success) {
-            console.log(data.message);
+            console.log(data.message); // Exibe mensagem de sucesso
         } else {
-            console.error('Erro ao salvar estado:', data.message);
+            console.error('Erro ao salvar estado:', data.message); // Exibe erro
         }
     })
     .catch(error => {
-        console.error('Erro na requisição:', error);
+        console.error('Erro na requisição:', error); // Exibe erro na requisição
     });
 }
