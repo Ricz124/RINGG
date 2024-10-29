@@ -39,10 +39,11 @@ function addColumn() {
 
     board.appendChild(column);
 
-    // Salvar a nova coluna no banco de dados
-    saveColumnToDB(`Coluna ${columnCount}`);
-    saveStateToLocalStorage() // salva o estado atualizado
+    // Adicionar ao estado e salvar
+    state.columns.push({ id: columnCount, title: `Coluna ${columnCount}`, cards: [] });
+    saveStateToJSON();
 }
+
 
 function saveColumnToDB(title) {
     fetch('php/save_column.php', {
@@ -65,6 +66,9 @@ function saveColumnToDB(title) {
 // Função para adicionar um novo cartão
 function addCard(button) {
     const cardContainer = button.previousElementSibling;
+    const columnId = cardContainer.previousElementSibling.textContent.split(" ")[1];
+    const cardId = `${columnId}-${cardContainer.children.length + 1}`;
+
     const card = document.createElement("div");
     card.className = "card";
     card.draggable = true;
@@ -79,10 +83,12 @@ function addCard(button) {
 
     cardContainer.appendChild(card);
 
-    // Salvar o novo cartão no banco de dados
-    saveCardToDB(card);
-    saveStateToLocalStorage() // salva o estado atualizado
+    // Adicionar ao estado e salvar
+    const column = state.columns.find(col => col.id === parseInt(columnId));
+    column.cards.push({ id: cardId, title: "Novo Card", color: "#ffffff", tasks: [] });
+    saveStateToJSON();
 }
+
 
 function saveCardToDB(card) {
     fetch('php/save_card.php', {
@@ -165,6 +171,48 @@ function closeModal() {
     saveCheckboxes();
     saveStateToLocalStorage() // salva o estado atualizado
 }
+
+// Salva o estado dos checkboxes no JSON e no banco de dados
+function saveCheckboxes() {
+    const taskList = document.getElementById("taskList").children;
+    const tasks = Array.from(taskList).map(li => ({
+        text: li.querySelector("input[type='text']").value,
+        completed: li.querySelector("input[type='checkbox']").checked,
+    }));
+
+    if (activeCard) {
+        activeCard.dataset.tasks = JSON.stringify(tasks);
+
+        // Salvar tarefas no backend via PHP
+        fetch('php/save_card_tasks.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                cardId: activeCard.dataset.id,
+                tasks: tasks
+            }),
+        }).then(response => response.json())
+        .then(data => console.log('Tarefas salvas:', data))
+        .catch(error => console.error('Erro ao salvar tarefas:', error));
+    }
+}
+
+// Carrega as tarefas do JSON no modal do card
+function loadCheckboxes() {
+    const taskList = document.getElementById("taskList");
+    taskList.innerHTML = "";
+
+    const tasks = activeCard?.dataset.tasks ? JSON.parse(activeCard.dataset.tasks) : [];
+
+    tasks.forEach(task => {
+        const li = document.createElement("li");
+        li.innerHTML = `<input type="checkbox" ${task.completed ? "checked" : ""}> <input type="text" value="${task.text}">`;
+        taskList.appendChild(li);
+    });
+}
+
 
 // Função para salvar o título do card
 function saveCardTitle(input) {
@@ -267,13 +315,14 @@ function deleteCheckboxes() {
 }
 
 function deleteColumn(button) {
-    const column = button.parentElement; // Obter a coluna pai
-    column.remove(); // Remover a coluna do DOM
-    
+    const columnElement = button.parentElement;
+    const columnId = parseInt(columnElement.querySelector("h2").textContent.split(" ")[1]);
 
-    // Marcar a coluna como deletada no banco de dados
-    deleteColumnFromDB(column.querySelector("h2").textContent);
-    saveStateToLocalStorage() // salva o estado atualizado
+    columnElement.remove();
+
+    // Remover do estado e salvar
+    state.columns = state.columns.filter(col => col.id !== columnId);
+    saveStateToJSON();
 }
 
 function deleteColumnFromDB(title) {
@@ -301,14 +350,16 @@ function deleteColumnFromDB(title) {
 
 function deleteCard() {
     if (activeCard) {
-        // Remove o card do DOM
-        const cardContainer = activeCard.parentNode; // Obtém o container do card
-        cardContainer.removeChild(activeCard); // Remove o card do container
-        closeModal(); // Fecha o modal após deletar o card
+        const columnId = activeCard.parentNode.previousElementSibling.textContent.split(" ")[1];
+        const cardId = activeCard.dataset.id;
 
-        // Marcar o card como deletado no banco de dados
-        deleteCardFromDB(activeCard.querySelector(".card-title").textContent);
-        saveStateToLocalStorage() // salva o estado atualizado
+        activeCard.remove();
+        closeModal();
+
+        // Remover do estado e salvar
+        const column = state.columns.find(col => col.id === parseInt(columnId));
+        column.cards = column.cards.filter(card => card.id !== cardId);
+        saveStateToJSON();
     }
 }
 
@@ -334,9 +385,8 @@ function loadColumnsAndCards() {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                console.log('Dados carregados:', data.columns);
-                // Função para renderizar colunas e cards
-                renderColumns(data.columns);
+                state.columns = data.columns; // Carrega o estado
+                renderColumns(data.columns); // Renderiza colunas e cards
             } else {
                 console.error('Erro ao carregar colunas e cards:', data.message);
             }
@@ -420,4 +470,28 @@ function loadFromLocalStorage() {
             });
         });
     }
+}
+
+function saveStateToJSON() {
+    const jsonData = {
+        columns: state.columns.map(column => ({
+            id: column.id,
+            title: column.title,
+            cards: column.cards.map(card => ({
+                id: card.id,
+                title: card.title,
+                color: card.color,
+                dueDate: card.dueDate || null,
+                tasks: card.tasks || []
+            }))
+        }))
+    };
+
+    fetch('php/save_state.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(jsonData)
+    }).then(response => response.json())
+      .then(data => console.log('Dados salvos:', data))
+      .catch(error => console.error('Erro ao salvar dados:', error));
 }
