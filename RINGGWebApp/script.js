@@ -440,19 +440,24 @@ function loadCheckboxes() {
 
 
 function loadColumnsAndCards() {
-    fetch('php/load_columns_cards.php')
-        .then(response => response.json())
-        .then(data => {
+    fetch("php/load_columns_cards.php")
+    .then(response => response.text())
+    .then(text => {
+        console.log("Raw response:", text);
+        try {
+            const data = JSON.parse(text);
             if (data.success) {
-                state.columns = data.columns; // Carrega o estado
-                renderColumns(data.columns); // Renderiza colunas e cards
+                // Processar os dados
             } else {
-                console.error('Erro ao carregar colunas e cards:', data.message);
+                console.error("Erro ao carregar colunas e cards:", data.message);
             }
-        })
-        .catch(error => {
-            console.error('Erro na requisição:', error);
-        });
+        } catch (e) {
+            console.error("Erro de JSON:", e, text);
+        }
+    })
+    .catch(error => {
+        console.error("Erro na requisição:", error);
+    });
 }
 
 
