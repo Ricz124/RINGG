@@ -72,6 +72,7 @@ function saveColumnToDB(title) {
     .catch((error) => {
         console.error('Erro:', error);
     });
+    saveStateToJSON();
 }
 
 // Função para adicionar um novo cartão
@@ -100,8 +101,47 @@ function addCard(button) {
     saveStateToJSON();
 }
 
+// Função para adicionar um novo cartão
+function addCard(button) {
+    const cardContainer = button.previousElementSibling;
+    const columnId = cardContainer.previousElementSibling.textContent.split(" ")[1];
+    const cardId = `${columnId}-${cardContainer.children.length + 1}`;
+
+    const card = document.createElement("div");
+    card.className = "card";
+    card.draggable = true;
+    card.ondragstart = dragCard;
+    card.ondragover = allowDrop;
+    card.ondrop = dropCard;
+    card.onclick = () => openModal(card);
+    card.dataset.creationDate = new Date().toLocaleDateString();
+    card.dataset.color = "#ffffff";
+    card.innerHTML = `<span class="card-title" onclick="editCardTitle(this)">Novo Card</span>
+                      <input type="text" onblur="saveCardTitle(this)" style="display: none;">`;
+
+    cardContainer.appendChild(card);
+
+    // Adicionar ao estado e salvar
+    const column = state.columns.find(col => col.id === parseInt(columnId));
+    column.cards.push({ id: cardId, title: "Novo Card", color: "#ffffff", tasks: [] });
+    saveStateToJSON();
+
+    // Salvar o cartão no banco de dados
+    saveCardToDB(card);
+}
 
 function saveCardToDB(card) {
+    const userId = sessionStorage.getItem('user_id');
+    console.log("User ID:", userId); // Verifique se o user_id está realmente no sessionStorage
+    console.log("Card Data:", {
+        title: card.querySelector(".card-title").textContent,
+        userId: userId,
+        columnId: card.parentNode.previousElementSibling.innerText.replace('Coluna ', ''),
+        dueDate: card.dataset.dueDate || null,
+        color: card.dataset.color,
+        tasks: card.dataset.tasks || []
+    });
+
     fetch('php/save_card.php', {
         method: 'POST',
         headers: {
@@ -109,14 +149,14 @@ function saveCardToDB(card) {
         },
         body: JSON.stringify({
             title: card.querySelector(".card-title").textContent,
-            userId: sessionStorage.getItem('user_id'), // ID do usuário
-            columnId: card.parentNode.previousElementSibling.innerText.replace('Coluna ', ''),
+            userId: userId ? parseInt(userId) : null, // ID do usuário convertido para número ou null se ausente
+            columnId: parseInt(card.parentNode.previousElementSibling.innerText.replace('Coluna ', '')),
             dueDate: card.dataset.dueDate || null,
             color: card.dataset.color,
             tasks: card.dataset.tasks || []
         }),
     }).then(response => response.json()).then(data => {
-        console.log(data);
+        console.log("Resposta do servidor:", data);
     }).catch((error) => {
         console.error('Erro:', error);
     });

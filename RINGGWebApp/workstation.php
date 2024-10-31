@@ -5,7 +5,7 @@ require 'php/db.php'; // Inclua seu arquivo de conexão com o banco de dados
 // Você pode realizar consultas ao banco de dados aqui se necessário
 // Exemplo: Verificar se o usuário está logado
 if (!isset($_SESSION['user_id'])) {
-    header('Location: login.php'); // Redireciona para a página de login se o usuário não estiver autenticado
+    header('Location: php/login.php'); // Redireciona para a página de login se o usuário não estiver autenticado
     exit;
 }
 
