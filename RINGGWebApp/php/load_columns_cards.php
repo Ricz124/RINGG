@@ -11,7 +11,7 @@ if (empty($userId)) {
 }
 
 try {
-    $query = "SELECT * FROM columns WHERE user_id = :userId ORDER BY order_index";
+    $query = "SELECT * FROM columns WHERE user_id = :userId AND is_deleted = 0";
     $stmt = $pdo->prepare($query); // Supondo que $pdo seja usado consistentemente
     $stmt->bindParam(':userId', $userId, PDO::PARAM_INT);
     $stmt->execute();

@@ -33,7 +33,7 @@ function addColumn() {
     column.ondragover = allowDrop;
     column.ondrop = dropColumn;
     column.innerHTML = `
-      <h2 onclick="editColumnTitle(this)">Coluna ${columnCount}</h2>
+      <h3 onclick="editColumnTitle(this)">Coluna ${columnCount}</h3>
       <input type="text" onblur="saveColumnTitle(this)" style="display: none;">
       <div class="card-container" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
       <button onclick="addCard(this)">Adicionar Card</button>
@@ -56,17 +56,20 @@ function saveColumnToDB(title) {
         },
         body: JSON.stringify({
             title: title,
-            userId: sessionStorage.getItem('user_id'),
-            orderIndex: document.getElementById("board").children.length
+            userId: sessionStorage.getItem('user_id'), // Verifique se este ID está correto
+            orderIndex: document.getElementById("board").children.length // Pode ser alterado conforme necessário
         }),
-    }).then(response => response.json()).then(data => {
+    })
+    .then(response => response.json())
+    .then(data => {
         console.log(data);
         if (data.status === 'success') {
             loadColumnsAndCards(); // Recarrega as colunas após salvar
         } else {
             console.error("Erro ao salvar a coluna:", data.message);
         }
-    }).catch((error) => {
+    })
+    .catch((error) => {
         console.error('Erro:', error);
     });
 }
@@ -243,12 +246,29 @@ function editCardTitle(titleElement) {
 // Função para salvar o título da coluna
 function saveColumnTitle(input) {
     const columnElement = input.closest('.column');
-    const newTitle = input.value;
-    const columnId = columnElement.id.split('-')[1]; // Obtém o ID da coluna
+    const newTitle = input.value.trim(); // Remove espaços em branco antes e depois
+    const columnId = columnElement.id.split('-')[1]; // Extraindo o ID da coluna
+
+    // Tenta encontrar o elemento de título
+    const titleElement = columnElement.querySelector('h3'); // Ajuste para h3 se necessário
+    if (!titleElement) {
+        console.error("Elemento <h3> não encontrado na coluna.");
+        return; // Interrompe a execução caso o elemento não exista
+    }
+
+    // Verifica se o título ou ID não está vazio
+    if (!newTitle || !columnId) {
+        console.error('ID ou título não fornecidos.');
+        return; // Interrompe se o título ou ID não estão disponíveis
+    }
 
     // Atualize o título no frontend
-    columnElement.querySelector('h3').textContent = newTitle;
-    input.style.display = 'none';
+    titleElement.textContent = newTitle;
+    input.style.display = 'none'; // Oculta o input após salvar
+
+    // Log dos dados que serão enviados
+    const payload = { id: columnId, title: newTitle };
+    console.log("Enviando dados para o servidor:", payload);
 
     // Requisição para atualizar o título da coluna no banco de dados
     fetch('php/update_column_title.php', {
@@ -256,20 +276,20 @@ function saveColumnTitle(input) {
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ id: columnId, title: newTitle })
+        body: JSON.stringify(payload)
     })
-    .then(response => response.text()) // Inspecione a resposta como texto
-    .then(text => {
-        console.log("Resposta do servidor:", text); // Log da resposta bruta
-        try {
-            const data = JSON.parse(text); // Tente fazer o parse para JSON
-            if (data.success) {
-                console.log('Título da coluna atualizado com sucesso.');
-            } else {
-                console.error('Erro ao atualizar o título:', data.message);
-            }
-        } catch (error) {
-            console.error("Erro ao fazer parse do JSON:", error, text);
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok: ' + response.statusText);
+        }
+        return response.json(); // Retorna JSON diretamente
+    })
+    .then(data => {
+        console.log("Resposta do servidor:", data);
+        if (data.success) {
+            console.log('Título da coluna atualizado com sucesso.');
+        } else {
+            console.error('Erro ao atualizar o título:', data.message);
         }
     })
     .catch(error => {
@@ -353,7 +373,7 @@ function deleteCheckboxes() {
 
 function deleteColumn(button) {
     const columnElement = button.parentElement;
-    const columnId = parseInt(columnElement.querySelector("h2").textContent.split(" ")[1]);
+    const columnId = parseInt(columnElement.querySelector("h3").textContent.split(" ")[1]);
 
     columnElement.remove();
 
@@ -531,18 +551,13 @@ function loadCheckboxes() {
 
 function loadColumnsAndCards() {
     fetch("php/load_columns_cards.php")
-    .then(response => response.text())
-    .then(text => {
-        console.log("Raw response:", text);
-        try {
-            const data = JSON.parse(text);
-            if (data.success) {
-                renderColumns(data.columns); // Chamando a função de renderização
-            } else {
-                console.error("Erro ao carregar colunas e cards:", data.message);
-            }
-        } catch (e) {
-            console.error("Erro de JSON:", e, text);
+    .then(response => response.json()) // Certifique-se de que está esperando JSON
+    .then(data => {
+        console.log("Dados recebidos do servidor:", data);
+        if (data.success) {
+            renderColumns(data.columns); // Chamando a função de renderização
+        } else {
+            console.error("Erro ao carregar colunas e cards:", data.message);
         }
     })
     .catch(error => {
@@ -567,7 +582,7 @@ fetch("http://ricardohoster.byethost7.com/RINGG/RINGGWebApp/php/load_columns_car
     function saveStateToLocalStorage() {
         const columns = Array.from(document.querySelectorAll(".column")).map(column => {
             return {
-                title: column.querySelector("h2").textContent,
+                title: column.querySelector("h3").textContent,
                 cards: Array.from(column.querySelectorAll(".card")).map(card => ({
                     title: card.querySelector(".card-title").textContent,
                     dueDate: card.dataset.dueDate,
@@ -596,7 +611,7 @@ function loadFromLocalStorage() {
             column.ondragover = allowDrop;
             column.ondrop = dropColumn;
             column.innerHTML = `
-                <h2 onclick="editColumnTitle(this)">${columnData.title}</h2>
+                <h3 onclick="editColumnTitle(this)">${columnData.title}</h3>
                 <input type="text" onblur="saveColumnTitle(this)" style="display: none;">
                 <div class="card-container" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
                 <button onclick="addCard(this)">Adicionar Card</button>
@@ -672,5 +687,30 @@ function saveStateToServer() {
     })
     .catch(error => {
         console.error('Erro na requisição:', error); // Exibe erro na requisição
+    });
+}
+
+function testInsertColumns() {
+    const columnsData = {
+        columns: [
+            { id: 1, title: "Coluna 1", orderIndex: 1 },
+            { id: 2, title: "Coluna 2", orderIndex: 2 },
+            { id: 3, title: "Coluna 3", orderIndex: 3 }
+        ]
+    };
+
+    fetch('php/insert_columns.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(columnsData),
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log(data);
+    })
+    .catch(error => {
+        console.error('Erro ao inserir colunas:', error);
     });
 }
