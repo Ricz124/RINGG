@@ -17,12 +17,16 @@ function loadColumns() {
                 const newColumn = document.createElement('div');
                 newColumn.className = 'column';
                 newColumn.innerHTML = `<h3>${column.name}</h3>
+                                       <button onclick="editColumn(${column.id})">Editar</button>
+                                       <button onclick="deleteColumn(${column.id})">Deletar</button>
                                        <button onclick="addCard(${column.id})">Adicionar Card</button>
                                        <div class="cards"></div>`;
                 column.cards.forEach(card => {
                     const cardElement = document.createElement('div');
                     cardElement.className = 'card';
                     cardElement.innerText = card.name;
+                    cardElement.innerHTML += `<button onclick="editCard(${card.id})">Editar</button>
+                                              <button onclick="deleteCard(${card.id})">Deletar</button>`;
                     newColumn.querySelector('.cards').appendChild(cardElement);
                 });
                 document.getElementById('board').appendChild(newColumn);
@@ -51,6 +55,43 @@ function createColumn(name) {
     });
 }
 
+function editColumn(columnId) {
+    const newName = prompt('Digite o novo nome da coluna:');
+    if (newName) {
+        fetch('api/edit_column.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ id: columnId, name: newName }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload(); // Recarrega a página após a edição
+            }
+        });
+    }
+}
+
+function deleteColumn(columnId) {
+    if (confirm('Tem certeza que deseja deletar esta coluna?')) {
+        fetch('api/delete_column.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ id: columnId }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload(); // Recarrega a página após a exclusão
+            }
+        });
+    }
+}
+
 function addCard(columnId) {
     const cardName = prompt('Digite o nome do card:');
     if (cardName) {
@@ -67,7 +108,54 @@ function addCard(columnId) {
                 const cardElement = document.createElement('div');
                 cardElement.className = 'card';
                 cardElement.innerText = cardName;
-                document.querySelector(`.column:nth-child(${columnId}) .cards`).appendChild(cardElement);
+                cardElement.innerHTML += `<button onclick="editCard(${data.cardId})">Editar</button>
+                                          <button onclick="deleteCard(${data.cardId})">Deletar</button>`;
+                
+                const cardsContainer = document.querySelector(`.column:nth-child(${columnId}) .cards`);
+                if (cardsContainer) {
+                    cardsContainer.appendChild(cardElement);
+                    location.reload(); // Recarrega a página após a edição
+                } else {
+                    console.error('Cards container not found for column ID:', columnId);
+                }
+            }
+        })
+        .catch(error => console.error('Error adding card:', error));
+    }
+}
+
+function editCard(cardId) {
+    const newName = prompt('Digite o novo nome do card:');
+    if (newName) {
+        fetch('api/edit_card.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ id: cardId, name: newName }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload(); // Recarrega a página após a edição
+            }
+        });
+    }
+}
+
+function deleteCard(cardId) {
+    if (confirm('Tem certeza que deseja deletar este card?')) {
+        fetch('api/delete_card.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ id: cardId }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload(); // Recarrega a página após a exclusão
             }
         });
     }
