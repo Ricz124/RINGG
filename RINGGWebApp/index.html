@@ -1,40 +1,12 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kanban</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Kanban App</title>
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>Kanban</h1>
-            <nav>
-                <button id="btnRegister">Registrar</button>
-                <button id="btnLogin">Login</button>
-            </nav>
-        </header>
-        <main id="board">
-            <!-- Colunas serão adicionadas aqui -->
-        </main>
-        <button id="btnAddColumn">Adicionar Coluna</button>
-    </div>
-
-    <!-- Modal para registrar e fazer login -->
-    <div id="modal" class="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <form id="authForm">
-                <h2 id="modalTitle">Registrar</h2>
-                <input type="text" id="name" placeholder="Nome" required>
-                <input type="email" id="email" placeholder="Email" required>
-                <input type="password" id="password" placeholder="Senha" required>
-                <button type="submit" id="submitBtn">Registrar</button>
-            </form>
-        </div>
-    </div>
-
-    <script src="script.js"></script>
+    <div id="kanban-board"></div>
+    <script src="js/script.js"></script>
 </body>
 </html>
