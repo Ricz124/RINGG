@@ -167,6 +167,14 @@ function editCardTitle(titleElement) {
     input.focus();
 }
 
+function editColumnTitle(titleElement) {
+    const input = titleElement.nextElementSibling;
+    input.value = titleElement.textContent;
+    titleElement.style.display = "none";
+    input.style.display = "inline";
+    input.focus();
+}
+
 function saveColumnTitle(input) {
     const columnTitle = input.previousElementSibling;
     columnTitle.textContent = input.value;
@@ -231,4 +239,25 @@ function deleteCard() {
 
 function printBoardData() {
     console.log(JSON.stringify(boardData, null, 2));
+}
+
+function sendBoardDataToServer() {
+    // Converte o JSON para uma string para enviar ao servidor
+    const jsonData = JSON.stringify(boardData);
+
+    // Usa fetch para enviar uma requisição POST ao script PHP
+    fetch("php/processamentoDDados.php", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: jsonData
+    })
+    .then(response => response.json()) // opcional, caso o servidor retorne uma resposta em JSON
+    .then(data => {
+        console.log("Resposta do servidor:", data);
+    })
+    .catch(error => {
+        console.error("Erro ao enviar dados:", error);
+    });
 }
