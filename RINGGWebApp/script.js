@@ -1,11 +1,6 @@
 let draggedCard = null;
 let draggedColumn = null;
 let activeCard = null;
-let state = {
-    columns: [],
-    cards: []
-};
-
 
 document.addEventListener("DOMContentLoaded", () => {
     // Salvar título do card a partir do modal, após o DOM estar carregado
@@ -39,27 +34,6 @@ function addColumn() {
     `;
 
     board.appendChild(column);
-
-    // Salvar a nova coluna no banco de dados
-    saveColumnToDB(`Coluna ${columnCount}`);
-}
-
-function saveColumnToDB(title) {
-    fetch('php/save_column.php', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            title: title,
-            userId: sessionStorage.getItem('user_id'), // Supondo que você armazena o ID do usuário na sessão
-            orderIndex: document.getElementById("board").children.length
-        }),
-    }).then(response => response.json()).then(data => {
-        console.log(data);
-    }).catch((error) => {
-        console.error('Erro:', error);
-    });
 }
 
 // Função para adicionar um novo cartão
@@ -78,30 +52,6 @@ function addCard(button) {
                       <input type="text" onblur="saveCardTitle(this)" style="display: none;">`;
 
     cardContainer.appendChild(card);
-
-    // Salvar o novo cartão no banco de dados
-    saveCardToDB(card);
-}
-
-function saveCardToDB(card) {
-    fetch('php/save_card.php', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            title: card.querySelector(".card-title").textContent,
-            userId: sessionStorage.getItem('user_id'), // ID do usuário
-            columnId: card.parentNode.previousElementSibling.innerText.replace('Coluna ', ''),
-            dueDate: card.dataset.dueDate || null,
-            color: card.dataset.color,
-            tasks: card.dataset.tasks || []
-        }),
-    }).then(response => response.json()).then(data => {
-        console.log(data);
-    }).catch((error) => {
-        console.error('Erro:', error);
-    });
 }
 
 // Funções de arrastar e soltar colunas e cartões
@@ -196,7 +146,7 @@ function editColumnTitle(titleElement) {
 
 // Função para adicionar uma nova tarefa no modal
 function addCheckbox() {
-    const taskList = docuFment.getElementById("taskList");
+    const taskList = document.getElementById("taskList");
     const li = document.createElement("li");
     li.innerHTML = `<input type="checkbox"> <input type="text" placeholder="Nova Tarefa">`;
     taskList.appendChild(li);
@@ -259,127 +209,14 @@ function deleteCheckboxes() {
 function deleteColumn(button) {
     const column = button.parentElement; // Obter a coluna pai
     column.remove(); // Remover a coluna do DOM
-
-    // Marcar a coluna como deletada no banco de dados
-    deleteColumnFromDB(column.querySelector("h2").textContent);
 }
 
-function deleteColumnFromDB(title) {
-    fetch('php/delete_column.php', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            title: title,
-            userId: sessionStorage.getItem('user_id')
-        }),
-    }).then(response => response.json()).then(data => {
-        console.log(data);
-    }).catch((error) => {
-        console.error('Erro:', error);
-    });
-}
-
+// Função para deletar o card ativo
 function deleteCard() {
     if (activeCard) {
         // Remove o card do DOM
         const cardContainer = activeCard.parentNode; // Obtém o container do card
         cardContainer.removeChild(activeCard); // Remove o card do container
         closeModal(); // Fecha o modal após deletar o card
-
-        // Marcar o card como deletado no banco de dados
-        deleteCardFromDB(activeCard.querySelector(".card-title").textContent);
     }
 }
-
-function deleteCardFromDB(title) {
-    fetch('php/delete_card.php', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            title: title,
-            userId: sessionStorage.getItem('user_id')
-        }),
-    }).then(response => response.json()).then(data => {
-        console.log(data);
-    }).catch((error) => {
-        console.error('Erro:', error);
-    });
-}
-
-// Adiciona esta função ao seu script.js
-function loadColumnsAndCards() {
-    fetch('php/load_columns_cards.php')
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log(data); // Imprime o JSON no console
-            
-            if (data.success) {
-                const board = document.getElementById("board");
-                board.innerHTML = ""; // Limpa o quadro antes de carregar
-
-                // Adiciona cada coluna e seus cartões ao quadro
-                data.columns.forEach(column => {
-                    const columnDiv = document.createElement("div");
-                    columnDiv.className = "column";
-                    columnDiv.draggable = true;
-                    columnDiv.ondragstart = dragColumn;
-                    columnDiv.ondragover = allowDrop;
-                    columnDiv.ondrop = dropColumn;
-                    columnDiv.innerHTML = `
-                        <h2 onclick="editColumnTitle(this)">${column.title}</h2>
-                        <input type="text" onblur="saveColumnTitle(this)" style="display: none;">
-                        <div class="card-container" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
-                        <button onclick="addCard(this)">Adicionar Card</button>
-                        <button onclick="deleteColumn(this)">Deletar Coluna</button>
-                    `;
-
-                    // Adiciona os cartões à coluna
-                    column.cards.forEach(card => {
-                        const cardDiv = document.createElement("div");
-                        cardDiv.className = "card";
-                        cardDiv.draggable = true;
-                        cardDiv.ondragstart = dragCard;
-                        cardDiv.ondragover = allowDrop;
-                        cardDiv.ondrop = dropCard;
-                        cardDiv.onclick = () => openModal(cardDiv);
-                        cardDiv.dataset.creationDate = new Date(card.creation_date).toLocaleDateString();
-                        cardDiv.dataset.color = card.color;
-                        cardDiv.innerHTML = `<span class="card-title" onclick="editCardTitle(this)">${card.title}</span>
-                                             <input type="text" onblur="saveCardTitle(this)" style="display: none;">`;
-
-                        columnDiv.querySelector(".card-container").appendChild(cardDiv);
-                    });
-
-                    board.appendChild(columnDiv);
-                });
-            }
-        })
-        .catch(error => {
-            console.error('Erro ao carregar colunas e cartões:', error);
-        });
-}
-
-
-// Atualize o evento DOMContentLoaded para incluir a nova função
-document.addEventListener("DOMContentLoaded", () => {
-    const cardTitleInput = document.getElementById("cardTitle");
-    if (cardTitleInput) {
-        cardTitleInput.addEventListener("input", (event) => {
-            if (activeCard) {
-                activeCard.querySelector(".card-title").textContent = event.target.value;
-            }
-        });
-    }
-
-    // Carregar colunas e cartões
-    loadColumnsAndCards();
-});
