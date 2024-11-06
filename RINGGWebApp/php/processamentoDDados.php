@@ -1,4 +1,5 @@
 <?php
+session_start();
 header('Content-Type: application/json');
 
 // Recebe o conteúdo da requisição POST (JSON)
