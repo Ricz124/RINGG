@@ -242,10 +242,8 @@ function printBoardData() {
 }
 
 function sendBoardDataToServer() {
-    // Converte o JSON para uma string para enviar ao servidor
     const jsonData = JSON.stringify(boardData);
 
-    // Usa fetch para enviar uma requisição POST ao script PHP
     fetch("php/processamentoDDados.php", {
         method: "POST",
         headers: {
@@ -253,7 +251,15 @@ function sendBoardDataToServer() {
         },
         body: jsonData
     })
-    .then(response => response.json()) // opcional, caso o servidor retorne uma resposta em JSON
+    .then(response => {
+        if (!response.ok) {
+            throw new Error("Erro na requisição ao servidor");
+        }
+        // Verifica se a resposta é JSON antes de interpretá-la
+        return response.json().catch(() => {
+            throw new Error("Resposta do servidor não é um JSON válido");
+        });
+    })
     .then(data => {
         console.log("Resposta do servidor:", data);
     })
